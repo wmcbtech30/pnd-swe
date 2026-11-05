@@ -33,9 +33,9 @@ fun ToolsScreen(onSync: () -> Unit, onSettings: () -> Unit, onPending: (Int) -> 
             Spacer(Modifier.height(24.dp))
             SectionLabel(stringResource(R.string.tools_application))
             Spacer(Modifier.height(8.dp))
-            MenuRow(stringResource(R.string.tools_sync), Icons.Outlined.Sync, onSync)
+            MenuRow(stringResource(R.string.tools_sync), Icons.Outlined.Sync, onClick = onSync)
             Spacer(Modifier.height(8.dp))
-            MenuRow(stringResource(R.string.tools_settings), Icons.Outlined.Settings, onSettings)
+            MenuRow(stringResource(R.string.tools_settings), Icons.Outlined.Settings, onClick = onSettings)
         }
     }
 }

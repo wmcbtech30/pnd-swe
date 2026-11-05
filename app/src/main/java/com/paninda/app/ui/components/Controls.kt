@@ -69,9 +69,9 @@ fun ActionFab(label: String, icon: ImageVector, enabled: Boolean = true, onClick
 }
 
 @Composable
-fun MenuRow(label: String, icon: ImageVector, onClick: () -> Unit) {
+fun MenuRow(label: String, icon: ImageVector, enabled: Boolean = true, onClick: () -> Unit) {
     Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(10.dp)).background(Palette.Card)
-        .clickable(onClick = onClick).heightIn(min = 44.dp)
+        .clickable(enabled = enabled, onClick = onClick).heightIn(min = 44.dp)
         .padding(horizontal = 12.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
         Icon(icon, contentDescription = null, modifier = Modifier.size(20.dp), tint = Palette.Icon)
         Spacer(Modifier.width(8.dp))

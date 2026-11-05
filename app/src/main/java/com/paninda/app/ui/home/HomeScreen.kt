@@ -38,7 +38,7 @@ fun HomeScreen(state: ShopState, onSell: () -> Unit, onHistory: () -> Unit,
         in 12..17 -> R.string.home_greeting_afternoon
         else -> R.string.home_greeting_evening
     }
-    PageScaffold(title = stringResource(greeting), subtitle = stringResource(R.string.common_local_storage),
+    PageScaffold(title = stringResource(greeting), subtitle = stringResource(R.string.home_local_first),
         actions = {
             IconButton(onSync) { Icon(Icons.Default.Refresh, stringResource(R.string.home_refresh),
                 Modifier.size(32.dp), tint = Palette.Icon) }

@@ -9,15 +9,19 @@ import kotlinx.coroutines.flow.combine
 import java.time.Clock
 import java.util.Locale
 import java.util.UUID
+import com.paninda.app.data.sync.SnapshotFingerprint
+import com.paninda.app.data.sync.WorkbookBinding
 
 class ShopRepository(private val db: PanindaDatabase, private val clock: Clock = Clock.systemUTC()) {
     private val dao = db.shopDao()
     val state = combine(dao.observeProducts(), dao.observeTransactions(),
         dao.observePendingCount(), dao.observeState()) { products, transactions, pending, settings ->
         val values = settings.associate { it.key to it.value }
-        ShopState(loading = values["initialized"] != "true", connected = values["connected"] == "true",
+        ShopState(loading = values["initialized"] != "true", connected = values["connected"] == "true" && !values["workbook_id"].isNullOrBlank(),
             products = products.map { it.toDomain() }, transactions = transactions.map { it.toDomain() },
-            pendingCount = pending, lastCheckedAt = values["last_checked"]?.toLongOrNull())
+            pendingCount = pending, lastCheckedAt = values["last_checked"]?.toLongOrNull(),
+            workbookName = values["workbook_name"], accountEmail = values["account_email"],
+            syncStatus = if (pending > 0 && values["sync_status"] == "synced") "pending" else values["sync_status"] ?: "idle")
     }
 
     suspend fun initialize() = db.withTransaction {
@@ -26,20 +30,63 @@ class ShopRepository(private val db: PanindaDatabase, private val clock: Clock =
         }
     }
 
-    suspend fun connectLocal() = dao.putState(AppStateEntity("connected", "true"))
-    suspend fun disconnect() = dao.putState(AppStateEntity("connected", "false"))
-    suspend fun checkOffline() = dao.putState(AppStateEntity("last_checked", clock.millis().toString()))
+    suspend fun disconnect() = db.withTransaction {
+        dao.putState(AppStateEntity("connected", "false"))
+        // Retain the last binding/base to reconnect safely, and retain all pending local data.
+        dao.putState(AppStateEntity("sync_status", "idle"))
+    }
+    suspend fun syncStatus(value: String) = dao.putState(AppStateEntity("sync_status", value))
+    suspend fun binding(): WorkbookBinding? {
+        val id = dao.state("workbook_id")?.takeIf { it.isNotBlank() } ?: return null
+        return WorkbookBinding(id, dao.state("workbook_name").orEmpty(),
+            dao.state("account_subject").orEmpty(), dao.state("account_email").orEmpty())
+    }
+    suspend fun baseFor(binding: WorkbookBinding): String? {
+        val previous = binding()
+        return if (previous?.id == binding.id && previous.subject == binding.subject)
+            dao.state("sync_base")?.takeIf { it.isNotBlank() } else null
+    }
+
+    /** The comparison and import/acknowledgement share a transaction with every product edit. */
+    suspend fun completeSync(binding: WorkbookBinding, remote: ShopSnapshot, expectedLocal: String,
+        download: Boolean) = db.withTransaction {
+        val unchanged = SnapshotFingerprint.of(snapshot()) == expectedLocal
+        if (download && !unchanged) throw com.paninda.app.data.sync.SyncConflictException()
+        if (download) {
+            clearBusinessData()
+            remote.vendors.forEach { dao.putVendor(VendorEntity(it.id, it.name)) }
+            remote.products.forEach { dao.putProduct(it.toEntity()) }
+            dao.putTransactions(remote.transactions.map { it.toEntity() })
+            dao.putItems(remote.items.map { it.toEntity() })
+            dao.putMovements(remote.movements.map { it.toEntity() })
+        }
+        if (unchanged) {
+            dao.clearPending()
+            dao.acknowledgeTransactions(remote.transactions.map { it.id })
+        }
+        mapOf("workbook_id" to binding.id, "workbook_name" to binding.name,
+            "account_subject" to binding.subject, "account_email" to binding.email,
+            "sync_base" to SnapshotFingerprint.of(remote), "connected" to "true",
+            "sync_status" to "synced", "last_checked" to clock.millis().toString())
+            .forEach { (key, value) -> dao.putState(AppStateEntity(key, value)) }
+    }
 
     suspend fun resetLocalData() = db.withTransaction {
+        clearBusinessData()
+        dao.clearLastChecked()
+        // Local reset must never be translated into deleting the remote workbook.
+        dao.putState(AppStateEntity("sync_base", ""))
+        dao.putState(AppStateEntity("sync_status", "idle"))
+        dao.putState(AppStateEntity("initialized", "true"))
+    }
+
+    private suspend fun clearBusinessData() {
         dao.clearItems()
         dao.clearTransactions()
         dao.clearMovements()
         dao.clearProducts()
         dao.clearVendors()
         dao.clearPending()
-        dao.clearLastChecked()
-        // Preserve initialization and the local session. No records are seeded.
-        dao.putState(AppStateEntity("initialized", "true"))
     }
 
     suspend fun items(transactionId: String) = dao.items(transactionId).map { it.toDomain() }

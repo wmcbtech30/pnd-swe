@@ -24,7 +24,8 @@ import com.paninda.app.ui.tools.ToolsScreen
 import com.paninda.app.ui.sync.SyncStatusScreen
 import com.paninda.app.ui.settings.SettingsScreen
 import com.paninda.app.ui.navigation.BottomNavigation
-import com.paninda.app.ui.onboarding.OnboardingScreen
+import com.paninda.app.ui.connection.*
+import com.paninda.app.data.sync.ResolveGoogleConsent
 import com.paninda.app.ui.theme.Palette
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -33,6 +34,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun PanindaApp(vm: ShopViewModel) {
     val state by vm.state.collectAsStateWithLifecycle()
+    val resolveGoogle = rememberGoogleConsent()
     when {
         state.loading -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -47,32 +49,13 @@ fun PanindaApp(vm: ShopViewModel) {
                 Button(vm::load) { Text(stringResource(R.string.common_retry)) }
             }
         }
-        !state.connected -> {
-            val snackbar = remember { SnackbarHostState() }
-            val scope = rememberCoroutineScope()
-            val errorText = stringResource(R.string.common_action_failed)
-            var connecting by remember { mutableStateOf(false) }
-            Scaffold(contentWindowInsets = WindowInsets(0, 0, 0, 0),
-                snackbarHost = { AppSnackbar(snackbar) }) { padding ->
-                OnboardingScreen(Modifier.padding(padding)) {
-                    if (!connecting) {
-                        connecting = true
-                        scope.launch(Dispatchers.Main.immediate) {
-                            try { vm.connectLocal() }
-                            catch (e: CancellationException) { throw e }
-                            catch (_: Exception) { snackbar.showSnackbar(errorText) }
-                            finally { connecting = false }
-                        }
-                    }
-                }
-            }
-        }
-        else -> ConnectedApp(vm, state)
+        !state.connected -> ConnectionFlow(vm, resolveGoogle)
+        else -> ConnectedApp(vm, state, resolveGoogle)
     }
 }
 
 @Composable
-private fun ConnectedApp(vm: ShopViewModel, state: ShopState) {
+private fun ConnectedApp(vm: ShopViewModel, state: ShopState, resolveGoogle: ResolveGoogleConsent) {
     val nav = rememberNavController()
     val entry by nav.currentBackStackEntryAsState()
     val route = entry?.destination?.route.orEmpty().ifEmpty { "home" }
@@ -80,6 +63,20 @@ private fun ConnectedApp(vm: ShopViewModel, state: ShopState) {
     val snackbar = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
+    var cloudFailure by remember { mutableStateOf<Int?>(null) }
+    var retryDisconnect by remember { mutableStateOf(false) }
+    fun cloudAction(disconnect: Boolean = false) {
+        if (vm.cloudBusy) return
+        retryDisconnect = disconnect
+        scope.launch(Dispatchers.Main.immediate) {
+            try {
+                cloudFailure = null
+                if (disconnect) vm.disconnect() else vm.sync(resolveGoogle)
+                if (!disconnect) snackbar.showSnackbar(context.getString(R.string.sync_done))
+            } catch (e: CancellationException) { throw e }
+            catch (e: Exception) { cloudFailure = connectionError(e) }
+        }
+    }
     fun message(id: Int) { scope.launch(Dispatchers.Main.immediate) { snackbar.showSnackbar(context.getString(id)) } }
     fun action(block: suspend () -> Unit) {
         scope.launch(Dispatchers.Main.immediate) {
@@ -110,6 +107,11 @@ private fun ConnectedApp(vm: ShopViewModel, state: ShopState) {
             restoreState = true
         }
     }
+    if (cloudFailure != null) {
+        ConnectionNoticeScreen(true, busy = vm.cloudBusy, onStartOver = { cloudFailure = null },
+            onProceed = { cloudAction(retryDisconnect) }, bodyOverride = cloudFailure)
+        return
+    }
     Scaffold(containerColor = Palette.White, contentWindowInsets = WindowInsets(0, 0, 0, 0),
         bottomBar = { if (!editor) BottomNavigation(route, ::root) },
         snackbarHost = { AppSnackbar(snackbar, Modifier.padding(bottom = if (route == "home" || route.startsWith("inventory")) 80.dp else 0.dp)) },
@@ -129,12 +131,11 @@ private fun ConnectedApp(vm: ShopViewModel, state: ShopState) {
             composable("history") { HistoryScreen(state.transactions) { nav.navigate("transaction/" + Uri.encode(it)) } }
             composable("tools") { ToolsScreen({ nav.navigate("sync") }, { nav.navigate("settings") }, ::message) }
             composable("sync") {
-                SyncStatusScreen(state, { nav.popBackStack() }) {
-                    action { vm.checkOffline(); snackbar.showSnackbar(context.getString(R.string.sync_unavailable)) }
-                }
+                SyncStatusScreen(state, { nav.popBackStack() }, vm.cloudBusy) { cloudAction() }
             }
             composable("settings") {
-                SettingsScreen({ nav.popBackStack() }, onDisconnect = { action { vm.disconnect() } }, onReset = {
+                SettingsScreen(state, vm.cloudBusy, { nav.popBackStack() }, onSync = { cloudAction() },
+                    onDisconnect = { cloudAction(disconnect = true) }, onReset = {
                     action {
                         vm.resetLocalData()
                         if (!nav.popBackStack("home", inclusive = false)) {

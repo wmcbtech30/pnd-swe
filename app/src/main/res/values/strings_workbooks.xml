@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="workbooks_title">Your workbook</string>
+    <string name="workbooks_scope">Choose a saved Paninda workbook or create a separate one. Access is limited to files authorized for this app. Importing other spreadsheets is not available yet.</string>
+    <string name="workbooks_create">Create a new workbook</string>
+    <string name="workbooks_saved">SAVED PANINDA WORKBOOKS</string>
+    <string name="workbooks_empty">No saved Paninda workbooks found for this account.</string>
+    <string name="workbooks_default_name">Paninda Workbench</string>
+</resources>

@@ -24,19 +24,19 @@ class PrototypeUiTest {
     private val repo get() = app.repository
     @After fun close() { app.database.close() }
 
-    @Test fun cleanStartProductPersistenceDisconnectAndReset() {
+    @Test fun cleanStartProductPersistenceAndReset() {
         awaitText("Choose a data source to get started")
         assertEquals(ShopSnapshot(), runBlocking { repo.snapshot() })
         connect()
         compose.onNodeWithText("View all").performSemanticsAction(SemanticsActions.OnClick) { it() }
         awaitText("Search receipt number")
         compose.onNodeWithContentDescription("Home").performClick()
-        awaitText("OFFLINE · LOCAL STORAGE")
+        awaitText("LOCAL FIRST · GOOGLE SHEETS")
         compose.onNodeWithText("Search receipt number").assertDoesNotExist()
         compose.onNodeWithContentDescription("History").performClick()
         awaitText("Search receipt number")
         compose.onNodeWithContentDescription("Home").performClick()
-        awaitText("OFFLINE · LOCAL STORAGE")
+        awaitText("LOCAL FIRST · GOOGLE SHEETS")
         compose.onNodeWithContentDescription("Inventory").performClick()
         compose.onNodeWithText("New Product").performClick()
         fill("Product name", "Test Notebook")
@@ -52,12 +52,6 @@ class PrototypeUiTest {
         awaitText("Test Notebook")
         assertEquals(12, runBlocking { repo.snapshot().products.single().quantity })
         settings()
-        compose.onNodeWithText("Disconnect Workbook").performClick()
-        compose.onNodeWithText("Disconnect").performClick()
-        awaitText("Choose a data source to get started")
-        assertEquals(1, runBlocking { repo.snapshot().products.size })
-        connect()
-        settings()
         compose.onNodeWithText("Reset local data").performScrollTo().performClick()
         compose.onNodeWithText("Delete local data").performClick()
         awaitText("0.00")
@@ -65,8 +59,9 @@ class PrototypeUiTest {
     }
 
     private fun connect() {
-        compose.onNodeWithText("Connect to Google Sheets").performClick()
-        awaitText("OFFLINE · LOCAL STORAGE")
+        // Fixture binding only: this smoke check must never launch real Google consent.
+        runBlocking { TestFixtures.connect(repo) }
+        awaitText("LOCAL FIRST · GOOGLE SHEETS")
     }
     private fun settings() {
         compose.onNodeWithContentDescription("Tools").performClick()

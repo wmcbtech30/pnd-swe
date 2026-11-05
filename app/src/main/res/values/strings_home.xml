@@ -16,4 +16,5 @@
     <string name="home_refresh">Check sync status</string>
     <string name="home_recent_empty">Your recent receipts will appear here.</string>
     <string name="home_recent_line">%1$s · %2$s · Php%3$s</string>
+    <string name="home_local_first">LOCAL FIRST · GOOGLE SHEETS</string>
 </resources>

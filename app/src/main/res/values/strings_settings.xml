@@ -4,11 +4,18 @@
     <string name="settings_manage">MANAGE YOUR DATA</string>
     <string name="settings_disconnect">Disconnect Workbook</string>
     <string name="settings_reset">Reset local data</string>
-    <string name="settings_disconnect_title">Disconnect the local session?</string>
-    <string name="settings_disconnect_body">Return to onboarding? Your local records and pending changes will be kept.</string>
+    <string name="settings_disconnect_title">Disconnect Google Sheets?</string>
+    <string name="settings_disconnect_body">Revoke this app’s Google access and return to onboarding? Your local records, pending changes and Drive workbook will be kept. An internet connection is needed to revoke access.</string>
     <string name="settings_reset_title">Reset local data?</string>
-    <string name="settings_reset_body">Delete all local products, receipts, stock movements, and pending changes? This cannot be undone.</string>
+    <string name="settings_reset_body">Delete all local products, receipts, stock movements and pending changes? Unsynced records will be lost. The Drive workbook will not be deleted. A later sync can restore its records to this device.</string>
     <string name="settings_reset_confirm">Delete local data</string>
     <string name="settings_disconnect_confirm">Disconnect</string>
     <string name="settings_reset_done">Local data cleared.</string>
+    <string name="settings_connection">GOOGLE SHEETS CONNECTION</string>
+    <string name="settings_sync">Sync workbook</string>
+    <string name="settings_sync_busy">Working with Google…</string>
+    <string name="settings_conflicts">CONFLICTS AND WORKBOOK CARE</string>
+    <string name="settings_conflict_guidance">Work on one device at a time. Save local changes, sync, then edit the workbook. Avoid editing in Sheets while an upload is running.\n\nKeep worksheet names and row-1 headers in their original order at A1. Do not insert formulas into data fields. Compatibility detection for other workbooks is still pending.</string>
+    <string name="settings_conflict_detected">Sync paused: both copies have changed. Keep both copies and compare them before continuing.\n\nTo keep this device’s version separately, disconnect and create a new workbook. To restore the workbook version, first preserve unsynced records elsewhere, then reset local data and sync. Reset discards unsynced local changes.\n\nAutomatic merge and force-overwrite actions are not available.</string>
+    <string name="settings_contract_detected">The saved workbook failed its data-contract check. Keep a copy, then restore its worksheet names, original row-1 headers and field values. Retry sync after the repair.\n\nAlternatively, disconnect and create a new workbook from this device’s records.</string>
 </resources>

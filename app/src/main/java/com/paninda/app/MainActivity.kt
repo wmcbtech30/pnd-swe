@@ -16,7 +16,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             PanindaTheme(darkTheme = false) {
                 val vm: ShopViewModel = viewModel(factory = ShopViewModel.Factory(
-                    (application as PanindaApplication).repository))
+                    (application as PanindaApplication).repository, { (application as PanindaApplication).googleSync }))
                 PanindaApp(vm)
             }
         }

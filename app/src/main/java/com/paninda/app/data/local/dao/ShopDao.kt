@@ -19,6 +19,8 @@ interface ShopDao {
     @Query("SELECT * FROM transactions ORDER BY soldAt DESC, receiptNumber DESC")
     fun observeTransactions(): Flow<List<TransactionEntity>>
     @Query("SELECT * FROM transactions ORDER BY soldAt DESC") suspend fun transactions(): List<TransactionEntity>
+    @Query("UPDATE transactions SET syncState = 'ACKNOWLEDGED' WHERE id IN (:ids)")
+    suspend fun acknowledgeTransactions(ids: List<String>)
     @Query("SELECT * FROM vendors ORDER BY name") suspend fun vendors(): List<VendorEntity>
     @Query("SELECT * FROM transaction_items WHERE transactionId = :id ORDER BY rowid")
     suspend fun items(id: String): List<TransactionItemEntity>

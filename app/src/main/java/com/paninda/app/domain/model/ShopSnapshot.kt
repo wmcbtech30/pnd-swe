@@ -16,4 +16,7 @@ data class ShopState(
     val pendingCount: Int = 0,
     val lastCheckedAt: Long? = null,
     val loadFailed: Boolean = false,
+    val workbookName: String? = null,
+    val accountEmail: String? = null,
+    val syncStatus: String = "idle",
 )

@@ -7,6 +7,11 @@ import java.time.Instant
 
 /** Test-only records. Nothing in this file is packaged in the application. */
 object TestFixtures {
+    suspend fun connect(repo: com.paninda.app.data.repository.ShopRepository) {
+        val snapshot = repo.snapshot()
+        repo.completeSync(com.paninda.app.data.sync.WorkbookBinding("test-book", "Test workbook", "test-subject", "test@example.invalid"),
+            snapshot, com.paninda.app.data.sync.SnapshotFingerprint.of(snapshot), download = false)
+    }
     val now = Instant.parse("2026-11-05T01:00:00Z").toEpochMilli()
     fun snapshot(): ShopSnapshot {
         val vendor = Vendor("v-test", "Test Vendor")

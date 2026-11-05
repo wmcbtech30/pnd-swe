@@ -43,6 +43,8 @@ kotlin {
 }
 
 dependencies {
+    implementation(libs.google.auth)
+    implementation(libs.coroutines.play.services)
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.ui)

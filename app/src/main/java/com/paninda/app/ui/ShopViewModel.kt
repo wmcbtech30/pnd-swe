@@ -10,8 +10,15 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
+import com.paninda.app.adapters.sheets.*
+import com.paninda.app.data.sync.*
 
-class ShopViewModel(private val repository: ShopRepository) : ViewModel() {
+class ShopViewModel(private val repository: ShopRepository, private val google: () -> GoogleWorkbookSync) : ViewModel() {
+    var cloudBusy by mutableStateOf(false)
+        private set
     private val mutableState = MutableStateFlow(ShopState())
     val state = mutableState.asStateFlow()
     private var loadingJob: Job? = null
@@ -32,19 +39,26 @@ class ShopViewModel(private val repository: ShopRepository) : ViewModel() {
         }
     }
 
-    suspend fun connectLocal() = repository.connectLocal()
-    suspend fun disconnect() = repository.disconnect()
-    suspend fun resetLocalData() = repository.resetLocalData()
-    suspend fun checkOffline() = repository.checkOffline()
+    private suspend fun <T> cloud(block: suspend () -> T): T {
+        check(!cloudBusy) { "A Google operation is already running" }
+        cloudBusy = true
+        try { return block() } finally { cloudBusy = false }
+    }
+    suspend fun discover(resolve: ResolveGoogleConsent) = cloud { google().discover(resolve) }
+    suspend fun connect(account: GoogleAccountInfo, workbook: DriveWorkbook?, title: String, resolve: ResolveGoogleConsent) =
+        cloud { google().connect(account, workbook, title, resolve) }
+    suspend fun sync(resolve: ResolveGoogleConsent) = cloud { google().sync(resolve) }
+    suspend fun disconnect() = cloud { google().disconnect() }
+    suspend fun resetLocalData() { check(!cloudBusy); repository.resetLocalData() }
     suspend fun saveProduct(id: String?, draft: ProductDraft) = repository.saveProduct(id, draft)
     suspend fun items(id: String) = repository.items(id)
     suspend fun movements(id: String) = repository.movements(id)
 
-    class Factory(private val repository: ShopRepository) : ViewModelProvider.Factory {
+    class Factory(private val repository: ShopRepository, private val google: () -> GoogleWorkbookSync) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             require(modelClass.isAssignableFrom(ShopViewModel::class.java))
             @Suppress("UNCHECKED_CAST")
-            return ShopViewModel(repository) as T
+            return ShopViewModel(repository, google) as T
         }
     }
 }

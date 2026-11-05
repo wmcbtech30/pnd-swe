@@ -1,0 +1,99 @@
+Paninda revision 003 — Google Drive / Sheets integration
+Date: 2026-11-05 (UTC)
+Branch: litmus_2
+Base: litmus_1 at 1de1a71
+
+REQUEST
+Implement real Google OAuth, workbook connection/disconnection, modular local-first
+Sheets translation, Settings conflict suggestions and Figma 28:404 warning/error
+layout. Compatibility detection is deferred; the notice must be blanket and
+rephrased. Keep clean startup and the lean regression suite.
+
+IMPLEMENTED
+- Removed the production local-session onboarding bypass. Home opens only after
+  Google authorization, workbook initialization/read and local binding succeed.
+- Google Play services AuthorizationClient handles account/permission resolution,
+  token renewal requests and grant revocation. No client secret, service account,
+  refresh token or Google access token is persisted in Room or logged.
+- Native Drive listing is scoped to app-authorized, app-marked Paninda workbooks.
+  Uses drive.file, OpenID and email scopes instead of whole-Drive access.
+- Create a separate Paninda Workbench spreadsheet file with six canonical tabs;
+  write original row-1 headers at A1 and read back before recording a connection.
+  Mark reconnectable only after initialization verifies. No sample data added.
+- Reconnect to existing accessible Paninda workbooks, bound by account subject ID
+  and workbook ID. Different nonempty local data is not silently replaced.
+- Modular Google HTTP/Drive/Sheets adapters translate the shared ShopSnapshot
+  through the existing schema/mapper; core business models remain provider-free.
+- Manual local-first synchronization uses a common baseline and canonical hashes.
+  Upload local-only changes, import remote-only changes, acknowledge identical
+  copies, stop on divergence. Recheck remote before upload and verify afterward.
+- Room imports/acknowledgements compare the captured local hash transactionally.
+  Changes made during network work retain their pending entries. Verified receipt
+  records are acknowledged; incomplete/ambiguous uploads do not clear the outbox.
+- Real disconnect revokes Google's app grant before returning to onboarding.
+  Preserve local records/outbox, remote workbook and the prior comparison binding.
+  Revocation failure is shown; offline disconnection is not falsely reported.
+- Local reset invalidates the sync baseline. An empty device can restore remote
+  data; reset must never upload an empty snapshot as a remote deletion.
+- Settings displays account, workbook, sync state and contextual conflict/contract
+  guidance. Sync/disconnect/reset controls block overlapping cloud operations.
+- Figma warning/error page: supplied gradient and serif hero, independently
+  scrolling body, fixed Start Over / Proceed or Try Again actions. New workbook
+  selection page follows existing fonts/palette/Material icons.
+- Blanket warning explicitly says compatibility detection is pending, rather than
+  claiming incompatible rows were detected. Existing-workbook schema validation
+  still guards import/write integrity. Failed setup retry discards selection and
+  restarts Google authorization; normal sync retry obtains authorization and reads
+  both copies again.
+- Updated per-page string resources, current prototype/schema documentation and
+  Google Cloud/device acceptance guide. Existing Room schema version stays 1:
+  connection state uses its existing key/value table. Backup/transfer excludes
+  app data to avoid restoring stale workbook bindings onto another device.
+
+CLOUD SETUP REQUIRED BY PROJECT OWNER
+Enable Google Drive API and Google Sheets API. Configure OAuth branding/audience,
+Data Access and tester accounts. Register an Android OAuth client:
+  package: com.paninda.app
+  current workspace debug signing SHA-1:
+  E3:CC:05:81:10:48:DA:34:32:9C:33:BE:DA:E4:7F:33:46:21:07:48
+A differently signed APK needs a matching registration. No Web client ID, API key,
+client secret or google-services.json is required by this native authorization
+flow. See docs/GOOGLE_SHEETS_SETUP.md for steps and official references.
+
+LIMITATIONS / PENDING
+- General-purpose compatibility detection and adoption of arbitrary existing
+  spreadsheets remain deferred. Required schema validation is already enforced.
+- Native selection is NOT a full Google Drive picker. Full Google Picker / other
+  spreadsheets / Excel import are not implemented.
+- SINGLE WRITER ONLY: Sheets batchUpdate has no compare-and-swap here. Before/
+  after reads narrow but cannot eliminate the concurrent-editor overwrite window.
+  Do not edit Sheets or another device during sync. Reliable concurrent writes
+  need a coordinator/versioned write protocol, not just snapshot comparisons.
+- Manual sync only. No background worker, polling, automatic mutation retries,
+  automatic merge, row-diff UI, force overwrite or local-only backup export.
+- An interrupted creation/upload may already have reached Google. Orphaned or
+  duplicate workbook files can remain; the app does not silently delete files.
+- Real Google authorization/revocation/API acceptance needs a configured Cloud
+  project and physical Play-services device. No account/device validation is
+  claimed from the local regression suite.
+- Reports, selling/checkout, vendor-management tools, stock counts/receiving,
+  adjustments, staff roles and other financial workflows remain pending.
+- Google logo remains the requested placeholder; Custom Database remains locked.
+
+VERIFICATION
+- All 13 focused maintained checks passed: the prior 10 plus three sync data-loss
+  regressions. Covers divergence/second-read edits, in-flight local edits,
+  ambiguous upload retry and safe remote restoration after a local reset.
+- No maintained layout tests, screenshot baselines or device-size matrix added.
+  A temporary render harness stays under ignored work/ solely for inspection.
+- Final APK / lint / visual inspection results are appended below after checks.
+
+FINAL CHECKS
+- Final assembleDebug + lintDebug succeeded. Android lint: 0 errors; remaining
+  warnings are dependency-version notices and optional toUri/KTX style advice.
+- Inspected one-off warning, failure and compact large-text renders. Gradient
+  hero matches Figma 28:404; messages scroll separately and bottom actions remain
+  accessible. The render harness/images are ignored scratch files, not a suite.
+- Debug APK: app/build/outputs/apk/debug/app-debug.apk. Signing fingerprint checked
+  against the Cloud setup guide. No APK upload or remote Git push requested in
+  this implementation turn.

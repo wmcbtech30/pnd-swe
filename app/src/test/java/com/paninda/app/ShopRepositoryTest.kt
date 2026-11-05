@@ -28,14 +28,14 @@ class ShopRepositoryTest {
 
     @Test fun startupDisconnectAndResetNeverCreateRecords() = runBlocking {
         repository.initialize()
-        repository.connectLocal()
+        TestFixtures.connect(repository)
         assertEquals(ShopSnapshot(), repository.snapshot())
         assertTrue(db.shopDao().pending().isEmpty())
         repository.saveProduct(null, draft)
         repository.disconnect()
         assertFalse(repository.state.first().connected)
         assertEquals(1, repository.snapshot().products.size)
-        repository.connectLocal()
+        TestFixtures.connect(repository)
         repository.resetLocalData()
         repository.initialize()
         assertTrue(repository.state.first().connected)
@@ -75,7 +75,7 @@ class ShopRepositoryTest {
         try {
             val repo = ShopRepository(first)
             repo.initialize()
-            repo.connectLocal()
+            TestFixtures.connect(repo)
             repo.saveProduct(null, draft)
         } finally { first.close() }
         val second = Room.databaseBuilder(context, PanindaDatabase::class.java, name).build()

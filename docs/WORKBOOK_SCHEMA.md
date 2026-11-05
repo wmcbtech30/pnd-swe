@@ -1,13 +1,14 @@
 # Workbook contract, version 1
 
-This is the local mapping contract in `adapters/sheets/`. Google Sheets transport
-is unavailable in this build. No workbook is created, selected, read, or written.
+This is the mapping contract in `adapters/sheets/`. The Google adapter uses it
+to create, read and write app-owned workbooks; Room remains the working store.
 
 Each table occupies its own worksheet. Headers start at A1 in row 1; records
 start at row 2. One record occupies one row. No merged cells, title rows, or
 subtotal rows belong inside these tables. Worksheet names and header names are
-case-sensitive. The reader accepts reordered columns and additional named
-columns, but rejects missing or duplicate headers.
+case-sensitive. The pure mapper accepts reordered columns and additional named columns, but
+rejects missing or duplicate headers. The live read/write adapter requires the
+original exact header order, preventing writes from reassigning manual columns.
 
 | Worksheet | Headers, left to right from A1 |
 | --- | --- |
@@ -52,4 +53,8 @@ Void/refund/discount/tax/consignor-settlement rules are not defined yet. Extend
 the schema explicitly when those workflows are designed.
 
 Import validation is pure and rejects malformed data before any database write.
-No import UI or transactional import-to-Room workflow is implemented yet.
+The live Google adapter imports valid app-owned workbooks into Room transactionally.
+It requires the original canonical header order; the pure mapper still accepts
+reordered headers for future import workflows. General arbitrary-workbook
+compatibility detection/import is deferred. See GOOGLE_SHEETS_SETUP.md for sync
+conflict policy, single-writer limits and connection setup.
