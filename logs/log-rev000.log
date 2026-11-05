@@ -1,0 +1,270 @@
+PANINDA - PREFLIGHT REVIEW
+Revision: 000
+Date: 2026-11-05 (Asia/Manila)
+Repository: wmcbtech30/pnd-swe
+Current branch: onboard_demo
+Reviewed baseline: fc43a38 - Add nonfunctional onboarding demo
+Implementation status: ON HOLD. Awaiting the user's decision to implement.
+
+This log records the inspection findings and proposed implementation scope.
+Recommendations below are proposals, not completed or approved functionality.
+No application code was changed during this review.
+
+1. FIGMA REFERENCES
+
+File: https://www.figma.com/design/MAc7bCMKF4RDYbCYQetqt9/rgo
+
+  3:2     Onboarding
+  1:3     Home
+  9:131   Sell
+  14:53   Inventory
+  14:128  History
+  18:250  Tools
+  19:305  Tools > Sync Status
+  19:373  Tools > Settings
+
+All eight frames were inspected, including their reference screenshots.
+Each frame is 412 x 917, uses page-level layoutMode NONE, and has no prototype
+navigation links. Responsive layouts and navigation must be implemented in code.
+
+2. EXISTING COMPONENTS AND VARIANTS
+
+  NavBar                    Shared standalone component
+  Stocks Live Card          Healthy / HasLow
+  Out of Stocks Live Card   Healthy / HasOut
+  Inventory Product Entries Available / CriticalStock
+  Sell Product Entries      Available / OutofStock
+  Transaction Entries       NormalEntry / PendingSync
+  Toasts                    Offline / BackOnline
+  Sync Statuses             UpToDate / OfflineSync
+
+These can become reusable Compose components with appearance driven by data.
+Automatic Code Connect mapping is unavailable for the current Figma seat.
+Manual mapping of the inspected components into Compose remains feasible.
+
+3. PROPOSED WORKING SCOPE
+
+Onboarding:
+  - Google button immediately opens Home without authentication or Drive access.
+  - Preserve the existing removal of Excel.
+  - Keep Custom Database disabled.
+  - Keep the blank Google logo placeholder as previously requested.
+
+Home:
+  - Calculate sales totals, transaction count, and stock warnings from local data.
+  - Display recent transactions from the same records used by History.
+  - Use a bounded, independently scrollable recent-transactions area.
+
+Sell:
+  - Display products with search and contextual product filters.
+  - Cart, adding sale items, payments, and checkout remain unavailable.
+  - Selling functionality is explicitly outside this phase.
+
+Inventory:
+  - Display local products.
+  - Search by product name or SKU.
+  - Filter by stock status, vendor, or category.
+  - Proposed supporting functionality: basic product add/edit and product details.
+
+History:
+  - Display stored demo transactions.
+  - Search by receipt number and apply date filters.
+  - Proposed supporting functionality: read-only transaction details.
+
+Tools:
+  - Open Sync Status and Settings.
+  - Identify unfinished tools clearly.
+  - Vendors and Reports remain pending.
+  - Recommended pending item: Stock Counts, until its workflow is defined.
+
+Sync Status:
+  - Show the offline state and pending local changes.
+  - Sync Now must not report a successful upload while no cloud adapter exists.
+  - Avoid presenting a fictional successful sync time as a real event.
+
+Settings:
+  - Disconnect the demo session and return to onboarding.
+  - Reset local data through explicit confirmation.
+  - Define and document whether reset clears records or restores demo fixtures
+    before implementing the action.
+
+Demo data:
+  - Use unique receipt identifiers and consistent totals.
+  - Home and History must read the same records.
+  - Separate sample records from claims about actual external synchronization.
+
+4. MISSING FIGMA SCREENS AND RECOMMENDATIONS
+
+No separate frames were supplied for:
+  - Product details.
+  - Add/edit product.
+  - Transaction details.
+  - Contextual filter panels.
+  - Stock counting.
+
+Recommendation:
+  Build basic product add/edit and read-only transaction details using the
+  existing design language. Use matching bottom sheets for filters. Leave
+  stock counting documented as pending until its workflow is defined.
+
+These recommendations require the user's implementation decision; they have
+not been implemented as part of this review.
+
+5. LAYOUT AND STYLING REQUIREMENTS
+
+  - Keep title bars, search fields, and filter controls fixed outside scrolling
+    content.
+  - Isolate product, transaction, and form content in their own scroll containers.
+  - Give lists enough bottom padding to clear FABs, navigation, and system insets.
+  - FABs must include icons.
+  - Subpages must use chevron-left navigation.
+  - Replace suitable Figma icons with Material icons.
+  - Give every page and subpage its own Kotlin file.
+  - Preserve relative positioning and responsive behavior even where Figma does
+    not use auto layout.
+  - Match the reference at 412 x 917 and reflow for other portrait sizes and
+    larger system text.
+
+Palette observed in the eight screens:
+  #FFFFFF  white
+  #000000  black, including existing 4%, 10%, and 15% opacity treatments
+  #63ADC8  onboarding gradient
+  #0084FF  onboarding gradient
+  #161616  dark/disabled treatment, including existing 44% opacity
+  #0B63D7  primary buttons and pending-sync badge
+  #1E1E1E  icons
+  #F3F8FD  cards and menu rows
+  #E60000  stock warning at 28% opacity
+  #0062FF  link
+  #E90000  stock warning at 9% opacity
+  #4A4A4A  section text
+
+Restrict UI colors to this palette and its observed treatments. Override
+Material defaults so additional purple, yellow, or green does not appear.
+
+Observed typography:
+  IBM Plex Serif Italic
+  IBM Plex Sans Regular
+  Roboto Regular
+  Roboto Condensed Regular / Thin / Light
+
+Portrait locking is already configured. Android can override orientation in
+some multi-window or device-managed contexts, so absolute enforcement across
+every device cannot be guaranteed.
+
+6. LOCAL DATA ARCHITECTURE
+
+Recommendation: use Room, which sits on SQLite and provides typed queries,
+relationships, transactions, and migrations. An in-memory dictionary alone
+would lose changes when the app closes.
+
+Proposed structure:
+
+  domain/model/
+    Product.kt
+    Vendor.kt
+    Transaction.kt
+    TransactionItem.kt
+    StockMovement.kt
+    PendingChange.kt
+
+  data/local/
+    PanindaDatabase.kt
+    entities/
+    dao/
+    DemoData.kt
+
+  data/repository/
+    ShopRepository.kt
+
+  adapters/sheets/
+    WorkbookSchema.kt
+    SheetsMapper.kt
+    GoogleSheetsAdapter.kt
+
+  adapters/customdb/
+
+  ui/
+    home/HomeScreen.kt
+    sell/SellScreen.kt
+    inventory/InventoryScreen.kt
+    history/HistoryScreen.kt
+    tools/ToolsScreen.kt
+    sync/SyncStatusScreen.kt
+    settings/SettingsScreen.kt
+    components/
+
+Every additional page/subpage gets a separate Kotlin file. Screens receive
+data through ViewModels and the shared repository.
+
+Shared records should use stable IDs, unique SKUs, integer money amounts,
+timestamps, and transaction-item snapshots. Later product edits must not
+change historical receipt names, prices, or vendor attribution.
+
+7. ADAPTER BOUNDARIES
+
+Google Sheets remains a required future integration, implemented as an
+adapter. Product, inventory, and transaction rules remain independent of
+workbook cells. Custom database support is another adapter and remains disabled.
+
+The Sheets adapter owns:
+  - Tab names and exact headers starting at A1.
+  - Schema version and field validation.
+  - Conversion between shared records and spreadsheet rows.
+  - Future upload, download, and conflict handling.
+
+Map structured records to rows. Arbitrary SQL-to-spreadsheet-formula translation
+is not required.
+
+The workbook schema and mapping logic can be implemented and tested locally.
+Actual Google authentication, workbook selection, synchronization, retry
+processing, and multi-device conflict resolution remain pending for this phase.
+Offline messages must accurately state that cloud sync is not implemented yet.
+
+8. STRING ORGANIZATION
+
+Use page-specific resource files, for example:
+  res/values/strings_home.xml
+  res/values/strings_inventory.xml
+  res/values/strings_settings.xml
+
+Android combines these into one resource namespace. Use page prefixes such as
+home_today_sales to avoid collisions.
+
+9. IMPLEMENTATION STATUS DOCUMENTATION
+
+If implementation proceeds, document implemented, demo-only, and pending
+behavior in docs/PROTOTYPE_STATUS.md, including:
+  - Every unfinished button and workflow.
+  - Missing screens and design-derived additions.
+  - Demo data versus persistent user-entered records.
+  - Adapter and synchronization limitations.
+  - Disconnect and reset semantics.
+
+Reports, vendor management, and selling functionality are explicitly pending.
+Stock counting is recommended as pending because its workflow is not defined.
+
+10. FEASIBILITY AND VERIFICATION
+
+Feasible now:
+  - Responsive Compose screens and reusable component variants.
+  - Fixed headers/search/filter controls and isolated scrolling regions.
+  - Navigation, context-specific bottom-sheet filters, and icon-bearing FABs.
+  - Room-backed local persistence and consistent derived dashboard totals.
+  - Local workbook schema/mapping tests without a Google connection.
+  - Build, lint, data tests, and rendered phone-size layout checks.
+
+Outside this prototype phase:
+  - Actual Google authentication, Drive selection, and cloud synchronization.
+  - Multi-device synchronization/conflict resolution.
+  - Selling, payment, vendor-management, and reporting workflows.
+  - Automatic Figma Code Connect mapping with the current seat.
+
+Actual-device acceptance testing remains necessary for device-specific behavior.
+
+11. PROPOSED BRANCH
+
+Recommendation: create local_prototype from onboard_demo if implementation
+is authorized. No new implementation branch was created during this review.
+
+END OF REVIEW - IMPLEMENTATION REMAINS ON HOLD.
