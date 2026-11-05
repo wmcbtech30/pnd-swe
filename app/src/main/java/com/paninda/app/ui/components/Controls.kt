@@ -69,11 +69,13 @@ fun ActionFab(label: String, icon: ImageVector, enabled: Boolean = true, onClick
 }
 
 @Composable
-fun MenuRow(label: String, onClick: () -> Unit) {
-    Box(Modifier.fillMaxWidth().clip(RoundedCornerShape(10.dp)).background(Palette.Card)
+fun MenuRow(label: String, icon: ImageVector, onClick: () -> Unit) {
+    Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(10.dp)).background(Palette.Card)
         .clickable(onClick = onClick).heightIn(min = 44.dp)
-        .padding(start = 40.dp, end = 12.dp, top = 10.dp, bottom = 10.dp)) {
-        Text(label, fontSize = 20.sp)
+        .padding(horizontal = 12.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+        Icon(icon, contentDescription = null, modifier = Modifier.size(20.dp), tint = Palette.Icon)
+        Spacer(Modifier.width(8.dp))
+        Text(label, fontSize = 20.sp, modifier = Modifier.weight(1f))
     }
 }
 

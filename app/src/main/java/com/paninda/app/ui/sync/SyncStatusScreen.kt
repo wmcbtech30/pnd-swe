@@ -5,6 +5,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.WarningAmber
+import androidx.compose.material.icons.outlined.Sync
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -38,7 +39,7 @@ fun SyncStatusScreen(state: ShopState, onBack: () -> Unit, onCheck: () -> Unit) 
             Spacer(Modifier.height(28.dp))
             SectionLabel(stringResource(R.string.sync_tools))
             Spacer(Modifier.height(8.dp))
-            MenuRow(stringResource(R.string.sync_now), onCheck)
+            MenuRow(stringResource(R.string.sync_now), Icons.Outlined.Sync, onCheck)
         }
     }
 }

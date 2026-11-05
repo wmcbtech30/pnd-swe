@@ -3,6 +3,12 @@ package com.paninda.app.ui.tools
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.BarChart
+import androidx.compose.material.icons.outlined.FactCheck
+import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.outlined.Storefront
+import androidx.compose.material.icons.outlined.Sync
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -17,19 +23,19 @@ fun ToolsScreen(onSync: () -> Unit, onSettings: () -> Unit, onPending: (Int) -> 
             .padding(start = 26.dp, end = 22.dp, top = 12.dp, bottom = 24.dp)) {
             SectionLabel(stringResource(R.string.tools_management))
             Spacer(Modifier.height(8.dp))
-            MenuRow(stringResource(R.string.tools_vendors)) { onPending(R.string.tools_vendors_pending) }
+            MenuRow(stringResource(R.string.tools_vendors), Icons.Outlined.Storefront) { onPending(R.string.tools_vendors_pending) }
             Spacer(Modifier.height(8.dp))
-            MenuRow(stringResource(R.string.tools_stock_counts)) { onPending(R.string.tools_counts_pending) }
+            MenuRow(stringResource(R.string.tools_stock_counts), Icons.Outlined.FactCheck) { onPending(R.string.tools_counts_pending) }
             Spacer(Modifier.height(24.dp))
             SectionLabel(stringResource(R.string.tools_insights))
             Spacer(Modifier.height(8.dp))
-            MenuRow(stringResource(R.string.tools_reports)) { onPending(R.string.tools_reports_pending) }
+            MenuRow(stringResource(R.string.tools_reports), Icons.Outlined.BarChart) { onPending(R.string.tools_reports_pending) }
             Spacer(Modifier.height(24.dp))
             SectionLabel(stringResource(R.string.tools_application))
             Spacer(Modifier.height(8.dp))
-            MenuRow(stringResource(R.string.tools_sync), onSync)
+            MenuRow(stringResource(R.string.tools_sync), Icons.Outlined.Sync, onSync)
             Spacer(Modifier.height(8.dp))
-            MenuRow(stringResource(R.string.tools_settings), onSettings)
+            MenuRow(stringResource(R.string.tools_settings), Icons.Outlined.Settings, onSettings)
         }
     }
 }

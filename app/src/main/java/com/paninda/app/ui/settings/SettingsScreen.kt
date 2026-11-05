@@ -3,6 +3,9 @@ package com.paninda.app.ui.settings
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.DeleteOutline
+import androidx.compose.material.icons.outlined.LinkOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -21,9 +24,9 @@ fun SettingsScreen(onBack: () -> Unit, onDisconnect: () -> Unit, onReset: () -> 
             .padding(start = 26.dp, end = 22.dp, top = 12.dp, bottom = 24.dp)) {
             SectionLabel(stringResource(R.string.settings_manage))
             Spacer(Modifier.height(8.dp))
-            MenuRow(stringResource(R.string.settings_disconnect)) { dialog = "disconnect" }
+            MenuRow(stringResource(R.string.settings_disconnect), Icons.Outlined.LinkOff) { dialog = "disconnect" }
             Spacer(Modifier.height(8.dp))
-            MenuRow(stringResource(R.string.settings_reset)) { dialog = "reset" }
+            MenuRow(stringResource(R.string.settings_reset), Icons.Outlined.DeleteOutline) { dialog = "reset" }
         }
     }
     if (dialog.isNotEmpty()) {
