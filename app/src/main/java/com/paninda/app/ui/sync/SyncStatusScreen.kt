@@ -11,6 +11,7 @@ import androidx.compose.material.icons.outlined.CloudQueue
 import com.paninda.app.domain.model.SyncPhase
 import com.paninda.app.domain.model.syncSummary
 import androidx.compose.material.icons.outlined.Sync
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -44,13 +45,14 @@ fun SyncStatusScreen(state: ShopState, onBack: () -> Unit, busy: Boolean = false
             Text(syncStatusText(phase), fontFamily = AppFonts.Serif,
                 fontStyle = FontStyle.Italic, fontSize = 40.sp, lineHeight = 60.sp)
             Spacer(Modifier.height(8.dp))
-            Text(syncExplanation(phase), fontFamily = AppFonts.Condensed, fontSize = 20.sp)
-            Text(state.workbookName.orEmpty(), fontFamily = AppFonts.Condensed, fontSize = 20.sp)
-            Text(state.accountEmail.orEmpty(), fontFamily = AppFonts.Condensed, fontSize = 20.sp)
+            Text(syncExplanation(phase), fontFamily = AppFonts.Sans, fontSize = 20.sp, lineHeight = 28.sp)
+            HorizontalDivider(Modifier.padding(vertical = 16.dp), color = Palette.Search)
+            Text(state.workbookName.orEmpty(), fontFamily = AppFonts.Plex, fontSize = 20.sp, lineHeight = 28.sp)
+            Text(state.accountEmail.orEmpty(), fontFamily = AppFonts.Plex, fontSize = 20.sp, lineHeight = 28.sp)
             Text(lastSyncText(summary),
-                fontFamily = AppFonts.Condensed, fontSize = 20.sp)
+                fontFamily = AppFonts.Plex, fontSize = 20.sp, lineHeight = 28.sp)
             Text(pluralStringResource(R.plurals.sync_pending_count, state.pendingCount, state.pendingCount),
-                fontFamily = AppFonts.Condensed, fontSize = 20.sp, modifier = Modifier.padding(top = 8.dp))
+                fontFamily = AppFonts.Plex, fontSize = 20.sp, lineHeight = 28.sp, modifier = Modifier.padding(top = 8.dp))
             Spacer(Modifier.height(28.dp))
             SectionLabel(stringResource(R.string.sync_tools))
             Spacer(Modifier.height(8.dp))

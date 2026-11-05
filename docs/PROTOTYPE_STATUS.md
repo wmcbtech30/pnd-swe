@@ -1,12 +1,13 @@
 # Prototype status
 
 Branch: `litmus_3`, continuing the local-first prototype from `litmus_2`.
-Historical decisions and checks remain in `logs/log-rev000.log` through 010.
+Historical decisions and checks remain in `logs/log-rev000.log` through 011.
 
 ## Implemented
 
 - Compose onboarding, Home, Sell catalog, Inventory, History, Tools, Sync Status
-  and Settings. Five navigation pillars; tapping Home returns to the dashboard.
+  and Settings. Five navigation pillars have equal-width icon/Roboto-label tabs;
+  tapping Home returns to the dashboard. Navigation grows for larger text.
 - Responsive portrait layouts, fixed headers/search/filter actions, isolated
   scrolling and FAB clearance. Per-page Kotlin files and string resources.
 - Product creation/editing with SKU validation, integer-centavo prices, vendor
@@ -85,6 +86,9 @@ Historical decisions and checks remain in `logs/log-rev000.log` through 010.
   item snapshots, product versions and pending changes save together. Sheets
   maps count history through StockCounts and StockCountItems worksheets.
 
+- Sync Status uses Roboto for the explanation, a divider before connection
+  metadata, and IBM Plex Sans for the file name, email, last sync and change count.
+
 ## Operational limits and pending work
 
 | Area | Status |
@@ -132,4 +136,4 @@ Keep iteration lean: twenty-five focused checks covering existing data flows, wo
 sync presentation, launch-based greeting rotation, vendor lifecycle rules and
 inventory-report calculations and atomic sale/count recording. No maintained screenshot baselines, layout
 assertions or device matrix.
-Build/lint/regression results for this revision are recorded in log-rev010.
+Build/lint/regression results for this revision are recorded in log-rev011.

@@ -1,0 +1,38 @@
+Paninda revision 011 — navigation labels and Sync Status typography
+Date: 2026-11-05 (UTC)
+Branch: litmus_3
+Base: 3defc5b
+
+REQUEST
+Add aligned Roboto labels under the bottom-navigation icons: Home, Sell,
+Inventory, History and Tools. Sync Status file name, email, last sync and changes
+count use IBM Sans, separated from the introductory Roboto explanation.
+
+IMPLEMENTED
+- Equal-width navigation tabs center each existing 32dp Material icon above its
+  Roboto Regular label. Selected labels/icons share the existing blue highlight.
+  Bar height grows with wrapped/large labels; full tabs remain touch targets.
+  Existing system-navigation padding and light palette are preserved.
+- Tabs keep one accessible label and selected/Tab semantics rather than repeating
+  icon and text announcements. Existing navigation actions remain unchanged.
+- Vendor, report and stock-count subpages consistently select the Tools pillar.
+- Sync explanation uses Roboto Regular with explicit line height. A thin divider
+  and vertical spacing separate it from the connection metadata group.
+- File name, account email, last-sync getter output and pending-change count use
+  existing IBM Plex Sans Regular. Headline/status icons and Sync Now behavior
+  remain unchanged. No data, network, schema or string changes.
+- Updated prototype status. No maintained layout tests added.
+
+VERIFICATION
+Targeted behavior smoke, build/lint and ignored visual captures are running.
+Final outcomes appended after completion. No push/upload requested this turn.
+
+FINAL CHECKS
+- assembleDebug and lintDebug passed; lint: zero errors.
+- Existing end-to-end behavior smoke passed with the revised navigation semantics
+  and Sync Status scrolling. No navigation/auth/local-data behavior regressions.
+- Inspected three ignored temporary renders: aligned normal navigation labels,
+  320dp navigation at 2x text with labels wrapping inside their tabs, and Sync
+  Status showing Roboto explanation/divider/IBM Plex Sans metadata.
+- No maintained layout tests or additional regression suite added.
+- APK rebuilt locally. Changes committed on litmus_3; no push/upload requested.
