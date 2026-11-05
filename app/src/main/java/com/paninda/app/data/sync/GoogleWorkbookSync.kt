@@ -73,8 +73,7 @@ class GoogleWorkbookSync(private val repository: ShopRepository, private val aut
     private suspend fun syncWith(http: GoogleHttp, binding: WorkbookBinding) {
         val adapter = GoogleSheetsAdapter(http, binding.id)
         val inspection = adapter.inspect()
-        if (inspection.canRenameLegacy) adapter.initializePages(inspection)
-        else if (inspection.missingPages.isNotEmpty()) throw WorkbookFormatException("Missing Paninda worksheets")
+        if (inspection.missingPages.isNotEmpty()) throw WorkbookFormatException("Missing Paninda worksheets")
         WorkbookSynchronizer(repository).sync(adapter, binding)
     }
 

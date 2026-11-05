@@ -5,7 +5,18 @@ import com.paninda.app.domain.model.*
 import com.paninda.app.domain.model.Transaction
 
 @Entity(tableName = "vendors", indices = [Index(value = ["name"], unique = true)])
-data class VendorEntity(@PrimaryKey val id: String, val name: String)
+data class VendorEntity(@PrimaryKey val id: String, val name: String,
+    @ColumnInfo(defaultValue = "''") val contactPerson: String = "",
+    @ColumnInfo(defaultValue = "''") val phone: String = "",
+    @ColumnInfo(defaultValue = "''") val email: String = "",
+    @ColumnInfo(defaultValue = "''") val address: String = "",
+    @ColumnInfo(defaultValue = "''") val notes: String = "",
+    @ColumnInfo(defaultValue = "1") val isActive: Boolean = true,
+    @ColumnInfo(defaultValue = "0") val updatedAt: Long = 0,
+    @ColumnInfo(defaultValue = "1") val version: Long = 1,
+) {
+    fun toDomain() = Vendor(id, name, contactPerson, phone, email, address, notes, isActive, updatedAt, version)
+}
 
 @Entity(tableName = "products",
     indices = [Index(value = ["sku"], unique = true), Index("vendorId")],
@@ -73,3 +84,5 @@ fun Transaction.toEntity() = TransactionEntity(id, receiptNumber, soldAt, cashie
 fun TransactionItem.toEntity() = TransactionItemEntity(id, transactionId, productId,
     productNameSnapshot, vendorIdSnapshot, quantity, unitPriceMinor)
 fun StockMovement.toEntity() = StockMovementEntity(id, productId, quantityDelta, movementType, sourceId, occurredAt, reason)
+
+fun Vendor.toEntity() = VendorEntity(id, name, contactPerson, phone, email, address, notes, isActive, updatedAt, version)

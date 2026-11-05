@@ -31,25 +31,17 @@ class GoogleSheetsAdapter(private val http: GoogleHttp, private val workbookId: 
     suspend fun initializePages(inspection: WorkbookInspection) {
         val staged = inspection.stagedTables() // Validate existing app data before any mutation.
         val requests = JSONArray()
-        if (inspection.canRenameLegacy) {
-            WorkbookSchema.headers.keys.forEach { name ->
-                val page = inspection.pages.first { it.title == name }
-                requests.put(JSONObject().put("updateSheetProperties", JSONObject().put("properties",
-                    JSONObject().put("sheetId", page.id).put("title", PanindaPages.title(name))).put("fields", "title")))
-            }
-        } else {
-            var nextId = (inspection.pages.maxOfOrNull { it.id } ?: 0) + 1
-            for (table in staged) {
-                val title = PanindaPages.title(table.name)
-                val existing = inspection.pages.firstOrNull { it.title == title }
-                if (existing?.hasData == true) continue
-                val id = existing?.id ?: nextId++
-                if (existing == null) requests.put(JSONObject().put("addSheet", JSONObject().put("properties",
-                    JSONObject().put("sheetId", id).put("title", title))))
-                requests.put(JSONObject().put("updateCells", JSONObject().put("start", JSONObject()
-                    .put("sheetId", id).put("rowIndex", 0).put("columnIndex", 0))
-                    .put("rows", rows(listOf(table.headers) + table.rows)).put("fields", "userEnteredValue")))
-            }
+        var nextId = (inspection.pages.maxOfOrNull { it.id } ?: 0) + 1
+        for (table in staged) {
+            val title = PanindaPages.title(table.name)
+            val existing = inspection.pages.firstOrNull { it.title == title }
+            if (existing?.hasData == true) continue
+            val id = existing?.id ?: nextId++
+            if (existing == null) requests.put(JSONObject().put("addSheet", JSONObject().put("properties",
+                JSONObject().put("sheetId", id).put("title", title))))
+            requests.put(JSONObject().put("updateCells", JSONObject().put("start", JSONObject()
+                .put("sheetId", id).put("rowIndex", 0).put("columnIndex", 0))
+                .put("rows", rows(listOf(table.headers) + table.rows)).put("fields", "userEnteredValue")))
         }
         if (requests.length() > 0) http.request("$url:batchUpdate", "POST", JSONObject().put("requests", requests))
     }
@@ -65,7 +57,7 @@ class GoogleSheetsAdapter(private val http: GoogleHttp, private val workbookId: 
             WorkbookTable(name, cells.firstOrNull().orEmpty(), cells.drop(1))
         }
         tables.forEach { table ->
-            if (table.headers != WorkbookSchema.headers.getValue(table.name))
+            if (!WorkbookSchema.acceptsLiveHeaders(table.name, table.headers))
                 throw WorkbookFormatException("Restore row-1 headers in ${PanindaPages.title(table.name)}")
         }
         return SheetsMapper.fromTables(tables)

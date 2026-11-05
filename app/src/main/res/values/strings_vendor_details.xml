@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="vendor_details_title">Vendor details</string>
+    <string name="vendor_details_edit">Edit vendor</string>
+    <string name="vendor_details_archive">Archive vendor</string>
+    <string name="vendor_details_restore">Restore vendor</string>
+    <string name="vendor_details_missing">This vendor is no longer available.</string>
+    <string name="vendor_details_search">Search linked products</string>
+    <string name="vendor_details_add_product">Add product</string>
+    <string name="vendor_details_products">LINKED PRODUCTS</string>
+    <string name="vendor_details_stock">Current stock</string>
+    <string name="vendor_details_alerts">%1$d low stock · %2$d out of stock</string>
+    <string name="vendor_details_empty">No products are linked to this vendor yet.</string>
+    <string name="vendor_details_archived_note">Existing products and history are kept. Restore this vendor to link new products.</string>
+    <string name="vendor_details_archive_title">Archive this vendor?</string>
+    <string name="vendor_details_archive_body">Keep their products, stock and history, but hide this vendor from active lists and new product assignments. You can restore them later.</string>
+    <string name="vendor_details_restore_title">Restore this vendor?</string>
+    <string name="vendor_details_restore_body">Make this vendor available for new product assignments again. Their existing records stay intact.</string>
+</resources>

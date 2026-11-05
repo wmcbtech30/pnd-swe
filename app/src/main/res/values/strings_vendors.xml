@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="vendors_title">Vendors</string>
+    <string name="vendors_search">Search vendors</string>
+    <string name="vendors_new">New Vendor</string>
+    <string name="vendors_empty">No vendors yet. Add a vendor to organize their products and stock.</string>
+    <string name="vendors_summary">%1$d products · %2$d units</string>
+    <string name="vendors_filter">Show vendors</string>
+    <string name="vendors_active">Active</string>
+    <string name="vendors_archived">Archived</string>
+    <string name="vendors_all">All vendors</string>
+</resources>

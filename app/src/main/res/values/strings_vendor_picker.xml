@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="vendor_picker_title">Choose vendor</string>
+    <string name="vendor_picker_hint">Type a new name, or choose a saved active vendor.</string>
+    <string name="vendor_picker_archived">This vendor is archived. The existing link is kept; choose an active vendor to reassign.</string>
+    <string name="vendor_picker_empty">No active vendors match. You can add one in Tools → Vendors, or type a new name in the product form.</string>
+    <string name="vendor_picker_unavailable">Choose an active vendor. This vendor is archived or no longer available.</string>
+</resources>

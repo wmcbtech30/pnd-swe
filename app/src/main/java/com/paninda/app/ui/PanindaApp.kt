@@ -18,6 +18,7 @@ import com.paninda.app.R
 import com.paninda.app.domain.model.*
 import com.paninda.app.ui.home.HomeScreen
 import com.paninda.app.ui.sell.SellScreen
+import com.paninda.app.ui.vendors.*
 import com.paninda.app.ui.inventory.*
 import com.paninda.app.ui.history.*
 import com.paninda.app.ui.tools.ToolsScreen
@@ -59,7 +60,7 @@ private fun ConnectedApp(vm: ShopViewModel, state: ShopState, resolveGoogle: Res
     val nav = rememberNavController()
     val entry by nav.currentBackStackEntryAsState()
     val route = entry?.destination?.route.orEmpty().ifEmpty { "home" }
-    val editor = route == "product/new" || route.endsWith("/edit")
+    val editor = route.startsWith("product/new") || route == "vendor/new" || route.endsWith("/edit")
     val snackbar = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -128,7 +129,7 @@ private fun ConnectedApp(vm: ShopViewModel, state: ShopState, resolveGoogle: Res
                     onProduct = { nav.navigate("product/" + Uri.encode(it)) })
             }
             composable("history") { HistoryScreen(state.transactions) { nav.navigate("transaction/" + Uri.encode(it)) } }
-            composable("tools") { ToolsScreen({ nav.navigate("sync") }, { nav.navigate("settings") }, ::message) }
+            composable("tools") { ToolsScreen({ nav.navigate("vendors") }, { nav.navigate("sync") }, { nav.navigate("settings") }, ::message) }
             composable("sync") {
                 SyncStatusScreen(state, { nav.popBackStack() }, vm.cloudBusy) { cloudAction() }
             }
@@ -144,7 +145,22 @@ private fun ConnectedApp(vm: ShopViewModel, state: ShopState, resolveGoogle: Res
                     }
                 })
             }
-            composable("product/new") { NewProductScreen(state.products, vm) { nav.popBackStack() } }
+            composable("product/new?vendor={vendor}", arguments = listOf(navArgument("vendor") { defaultValue = "" })) { backStack ->
+                NewProductScreen(state.products, vm, { nav.popBackStack() }, backStack.arguments?.getString("vendor")?.takeIf { it.isNotEmpty() })
+            }
+            composable("vendors") {
+                VendorsScreen(state.vendors, state.products, { nav.popBackStack() }, { nav.navigate("vendor/new") },
+                    { nav.navigate("vendor/" + Uri.encode(it)) })
+            }
+            composable("vendor/new") { NewVendorScreen(state.vendors, vm) { nav.popBackStack() } }
+            composable("vendor/{id}/edit", arguments = listOf(navArgument("id") { type = NavType.StringType })) { entry ->
+                EditVendorScreen(requireNotNull(entry.arguments?.getString("id")), state.vendors, vm) { nav.popBackStack() }
+            }
+            composable("vendor/{id}", arguments = listOf(navArgument("id") { type = NavType.StringType })) { entry ->
+                val id = requireNotNull(entry.arguments?.getString("id"))
+                VendorDetailsScreen(id, state, vm, { nav.popBackStack() }, { nav.navigate("vendor/" + Uri.encode(id) + "/edit") },
+                    { nav.navigate("product/new?vendor=" + Uri.encode(id)) }, { nav.navigate("product/" + Uri.encode(it)) })
+            }
             composable("product/{id}/edit", arguments = listOf(navArgument("id") { type = NavType.StringType })) { backStack ->
                 EditProductScreen(requireNotNull(backStack.arguments?.getString("id")), state.products, vm) { nav.popBackStack() }
             }

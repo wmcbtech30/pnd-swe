@@ -13,7 +13,8 @@ object SheetsMapper {
         val tables = listOf(
             table("Meta", listOf(listOf("schema_version", WorkbookSchema.VERSION),
                 listOf("currency", "PHP"), listOf("shop_timezone", ShopZone.id))),
-            table("Vendors", snapshot.vendors.map { listOf(it.id, it.name) }),
+            table("Vendors", snapshot.vendors.map { listOf(it.id, it.name, it.contactPerson, it.phone,
+                it.email, it.address, it.notes, if (it.isActive) "TRUE" else "FALSE", instant(it.updatedAt), it.version.toString()) }),
             table("Products", snapshot.products.map { listOf(it.id, it.sku, it.name, it.vendorId,
                 it.category, it.unitPriceMinor.toString(), it.lowStockThreshold.toString(),
                 if (it.isActive) "TRUE" else "FALSE", instant(it.updatedAt), it.version.toString()) }),
@@ -50,7 +51,19 @@ object SheetsMapper {
         ensure(meta["schema_version"] == WorkbookSchema.VERSION, "Unsupported schema version")
         ensure(meta["currency"] == "PHP" && meta["shop_timezone"] == ShopZone.id, "Unsupported currency or timezone")
 
-        val vendors = records("Vendors").map { Vendor(it.text("vendor_id"), it.text("name")) }
+        val vendors = records("Vendors").map { row ->
+            fun optional(key: String, limit: Int): String = row[key].orEmpty().trim().also {
+                ensure(it.length <= limit, "Vendor field too long: $key")
+            }
+            val email = optional("email", 254)
+            ensure(email.isEmpty() || Regex("[^\\s@]+@[^\\s@]+\\.[^\\s@]+").matches(email), "Invalid vendor email")
+            val active = row.boolean("is_active")
+            val updated = row.time("updated_at")
+            val version = row.nonnegative("version")
+            ensure(version >= 1 && row.text("name").length <= 120, "Invalid vendor name or version")
+            Vendor(row.text("vendor_id"), row.text("name"), optional("contact_person", 120), optional("phone", 40),
+                email, optional("address", 300), optional("notes", 1000), active, updated, version)
+        }
         unique(vendors.map { it.id }, "vendor IDs")
         unique(vendors.map { it.name.lowercase(Locale.ROOT) }, "vendor names")
         val vendorNames = vendors.associate { it.id to it.name }

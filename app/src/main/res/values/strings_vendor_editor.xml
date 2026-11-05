@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="vendor_editor_new">New vendor</string>
+    <string name="vendor_editor_edit">Edit vendor</string>
+    <string name="vendor_editor_save">Save vendor</string>
+    <string name="vendor_editor_name">Vendor name</string>
+    <string name="vendor_editor_contact">Contact person</string>
+    <string name="vendor_editor_phone">Phone number</string>
+    <string name="vendor_editor_email">Email</string>
+    <string name="vendor_editor_address">Address</string>
+    <string name="vendor_editor_notes">Notes</string>
+    <string name="vendor_editor_optional">Only the vendor name is required. Contact details and notes are optional.</string>
+    <string name="vendor_editor_invalid">Enter a vendor name and a valid email if provided.</string>
+    <string name="vendor_editor_duplicate">A vendor with that name already exists, including archived vendors.</string>
+</resources>

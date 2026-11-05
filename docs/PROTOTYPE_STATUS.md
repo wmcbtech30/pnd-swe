@@ -1,7 +1,7 @@
 # Prototype status
 
-Branch: `litmus_2`, continuing the clean local-first prototype on `litmus_1`.
-Historical decisions and checks remain in `logs/log-rev000.log` through 006.
+Branch: `litmus_3`, continuing the local-first prototype from `litmus_2`.
+Historical decisions and checks remain in `logs/log-rev000.log` through 007.
 
 ## Implemented
 
@@ -55,6 +55,13 @@ Historical decisions and checks remain in `logs/log-rev000.log` through 006.
   local records, pending changes and last successful sync. Only a successful
   explicit Settings disconnect closes the local session.
 
+- Vendors under Tools: searchable active/archived lists, add/edit contact details
+  and notes, linked products and stock summaries, archive/restore confirmation.
+  Product forms select saved active vendors or create one by name. Archived
+  vendors retain existing links/history and cannot receive new product links.
+- Vendor IDs remain stable across renames; edits queue for explicit Sheets sync.
+  Contacts, archive state, timestamps and versions round-trip through the adapter.
+
 ## Operational limits and pending work
 
 | Area | Status |
@@ -63,13 +70,13 @@ Historical decisions and checks remain in `logs/log-rev000.log` through 006.
 | Device OAuth acceptance | Not verified against a real Google account/device in this environment. The device checklist remains required. |
 | Worksheet compatibility | Detects cell data and missing app worksheets before setup. Existing app headers/records are validated; unrelated worksheets are not imported. No automatic repair of malformed app data. |
 | File picker | Google’s own Android Picker selects one editable Sheets file. General Excel/table import remains pending. |
-| Sync scheduling | Manual Sync Now/Settings only; no background worker, polling, periodic sync or automatic retry. |
+| Sync scheduling | Manual Sync Now/Settings only; automatic sync is the last priority. No background worker, polling, periodic sync or automatic retry. |
 | Concurrency | Single writer only. Before/after checks detect many conflicts, but Sheets has no conditional-write CAS here. Do not edit Sheets or another device during sync. Reliable concurrent writes need a coordinator/protocol. |
 | Conflict resolution | Warnings and suggestions exist. No automatic merge, row comparison UI, force overwrite, or automatic local-only backup export. |
 | Failed creation | Timed-out work may have reached Google; incomplete or duplicate workbooks can remain. The app never automatically deletes them. |
-| Selling | Catalog/search/filter only. No cart, checkout, payment, receipt creation or sale stock deduction. |
+| Selling | POS transactions are excluded by the current scope. Catalog/search/filter only; no cart, checkout, payment, receipt creation or sale stock deduction. |
 | History | Displays persisted/imported receipts; no manual receipt creation. |
-| Vendors | Product vendor metadata only; vendor-management tools pending. |
+| Vendors | Management implemented. Vendor payments, settlement, purchase orders and receiving remain undefined/pending. |
 | Reports | Pending. |
 | Stock workflows | Physical counts, variance approval, receiving and adjustments pending. |
 | Product lifecycle | No delete/archive, barcode scan, images, variants or bulk import. |
@@ -82,8 +89,10 @@ Historical decisions and checks remain in `logs/log-rev000.log` through 006.
 `WORKBOOK_SCHEMA.md` defines the A1/row-1 contract. Core money, IDs, references,
 stock ledger and receipt-total rules remain unchanged. The Google adapter requires
 original header order; pure import mapping remains tolerant of reordered headers.
-App state/outbox are device metadata. No Room schema migration is needed because
-connection metadata uses the existing key/value state table.
+App state/outbox are device metadata. This branch uses a fresh Room/schema-1
+contract with expanded vendor columns. Per the requested testing workflow, no
+schema upgrades, migrations or backward compatibility are provided. Uninstall
+and use a new file or freshly initialized app worksheets when testing this branch.
 
 Figma file `MAc7bCMKF4RDYbCYQetqt9`: prior eight frames plus notice `28:404`.
 The warning/error layout uses its gradient, serif hero, scrolling body and fixed
@@ -96,6 +105,6 @@ Google Cloud registration, official references and device acceptance steps.
 
 ## Verification
 
-Keep iteration lean: nineteen focused checks covering existing data flows, worksheet inspection,
-sync presentation and launch-based greeting rotation. No maintained screenshot baselines, layout assertions or device matrix.
-Build/lint/regression results for this revision are recorded in log-rev006.
+Keep iteration lean: twenty focused checks covering existing data flows, worksheet inspection,
+sync presentation, launch-based greeting rotation and vendor lifecycle rules. No maintained screenshot baselines, layout assertions or device matrix.
+Build/lint/regression results for this revision are recorded in log-rev007.

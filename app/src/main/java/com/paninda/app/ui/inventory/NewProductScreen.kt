@@ -5,6 +5,6 @@ import com.paninda.app.domain.model.Product
 import com.paninda.app.ui.ShopViewModel
 
 @Composable
-fun NewProductScreen(products: List<Product>, vm: ShopViewModel, onBack: () -> Unit) {
-    ProductEditorScreen(null, products, vm, onBack)
+fun NewProductScreen(products: List<Product>, vm: ShopViewModel, onBack: () -> Unit, initialVendorId: String? = null) {
+    ProductEditorScreen(null, products, vm, onBack, initialVendorId)
 }

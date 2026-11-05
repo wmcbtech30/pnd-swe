@@ -20,4 +20,5 @@ data class ShopState(
     val accountEmail: String? = null,
     val syncStatus: String = "idle",
     val networkStatus: NetworkStatus = NetworkStatus.UNKNOWN,
+    val vendors: List<Vendor> = emptyList(),
 )

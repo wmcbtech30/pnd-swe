@@ -32,15 +32,4 @@ class WorkbookInspectionTest {
         assertThrows(WorkbookFormatException::class.java) { collision.stagedTables() }
     }
 
-    @Test fun completeLegacyLayoutCanBeRenamedWithoutLosingRecords() {
-        val snapshot = TestFixtures.snapshot()
-        val tables = SheetsMapper.toTables(snapshot)
-        val legacy = WorkbookInspection(tables.mapIndexed { index, table ->
-            SpreadsheetPage(index, table.name, listOf(table.headers) + table.rows)
-        })
-        assertTrue(legacy.canRenameLegacy)
-        assertFalse(legacy.requiresWarning)
-        assertEquals(snapshot.products, SheetsMapper.fromTables(legacy.stagedTables()).products)
-        assertTrue(PanindaPages.titles.all { it.endsWith(" (Paninda)") })
-    }
 }

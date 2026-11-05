@@ -8,7 +8,7 @@ object WorkbookSchema {
     const val VERSION = "1"
     val headers = linkedMapOf(
         "Meta" to listOf("key", "value"),
-        "Vendors" to listOf("vendor_id", "name"),
+        "Vendors" to listOf("vendor_id", "name", "contact_person", "phone", "email", "address", "notes", "is_active", "updated_at", "version"),
         "Products" to listOf("product_id", "sku", "name", "vendor_id", "category",
             "unit_price_minor", "low_stock_threshold", "is_active", "updated_at", "version"),
         "Sales" to listOf("sale_id", "receipt_number", "sold_at", "cashier_name", "payment_method",
@@ -18,6 +18,7 @@ object WorkbookSchema {
         "StockMovements" to listOf("movement_id", "product_id", "quantity_delta",
             "movement_type", "source_id", "occurred_at", "reason"),
     )
+    fun acceptsLiveHeaders(name: String, actual: List<String>) = actual == headers.getValue(name)
 }
 
 class WorkbookFormatException(message: String) : IllegalArgumentException(message)

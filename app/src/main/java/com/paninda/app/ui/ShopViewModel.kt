@@ -68,6 +68,8 @@ class ShopViewModel(private val repository: ShopRepository, private val google: 
     suspend fun disconnect() = cloud { google().disconnect() }
     suspend fun resetLocalData() { check(!cloudBusy); repository.resetLocalData() }
     suspend fun saveProduct(id: String?, draft: ProductDraft) = repository.saveProduct(id, draft)
+    suspend fun saveVendor(id: String?, draft: VendorDraft) = repository.saveVendor(id, draft)
+    suspend fun setVendorActive(id: String, active: Boolean) = repository.setVendorActive(id, active)
     suspend fun items(id: String) = repository.items(id)
     suspend fun movements(id: String) = repository.movements(id)
 

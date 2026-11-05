@@ -1,0 +1,64 @@
+Paninda revision 007 — vendor management under Tools
+Date: 2026-11-05 (UTC)
+Branch: litmus_3
+Base: 7c5fbeb (litmus_2)
+
+REQUEST / SCOPE
+Prioritize Vendors/vendor management under Tools. POS transactions are excluded;
+automatic sync remains the last priority. No sample business records.
+Explicit user correction: no backward compatibility and no schema upgrades;
+testing uses uninstall/recreation. This overrides migration planning.
+
+IMPLEMENTED
+- Tools opens Vendors: search by name/contact/phone/email, Active/Archived/All
+  filter bottom sheet, linked active-product/stock counts and icon New Vendor FAB.
+- Separate Vendors, Vendor Details, New Vendor, Edit Vendor and editor Kotlin
+  files; page-specific string resources. Existing palette/Material icons reused.
+  Headers/search stay fixed; content scrolls independently with FAB clearance.
+- Vendor details: optional contact person, phone, email, address and notes;
+  linked-product search/navigation, current stock and low/out-of-stock counts.
+- Create/edit with trimmed required name, case-insensitive uniqueness (including
+  archived vendors), field lengths and basic optional-email validation. Unsaved
+  editor changes require confirmation before leaving.
+- Confirmed archive/restore preserves product links, stock movements and receipt
+  snapshots. Archived vendors cannot receive new product assignments, but edits
+  may retain an existing link. Restore makes assignments available again.
+- Product forms can choose saved active vendors or create a vendor by name.
+  New Product from vendor details preselects that vendor. Stable IDs survive
+  vendor renames and keep product/history references intact.
+- Central vendor domain/draft/results, Room entity/DAO/state and repository own
+  validation/persistence. Vendor edits increment version/timestamp and coalesce
+  into the existing pending UPSERT queue. No automatic sync added.
+- Sheets mapper/adapter includes all ten vendor fields, retaining modular local
+  storage and transport boundaries. Vendors (Paninda) A1 headers now are:
+  vendor_id,name,contact_person,phone,email,address,notes,is_active,updated_at,version
+- Fresh Room database version 1 and Sheets schema_version 1 only. Replaced the
+  exported fresh-install schema; no migration or backward-compatible header
+  handling. Removed legacy unsuffixed worksheet renaming. Existing old vendor
+  headers fail validation rather than being silently converted. Use a fresh
+  installation/new file or newly initialized app worksheets for this branch.
+- Updated prototype status, workbook contract and Google setup/device checklist.
+  Local reset wording now explicitly includes vendors, which reset already clears.
+
+VERIFICATION
+- All 20 maintained focused checks passed, zero failures/errors. Two new vendor
+  repository checks cover validation/duplicates, stable rename links, queue
+  coalescing, archive assignment restrictions, retained edits and restoration.
+- Expanded existing Sheets round-trip coverage for contacts/notes/archive state
+  and the existing behavior smoke for Tools navigation, create/edit/archive/
+  restore, unchanged product stock/links and reset.
+- Removed the obsolete legacy worksheet-renaming test. No maintained layout,
+  screenshot baseline or device matrix tests added.
+- Ignored temporary renderer passed; inspected vendor list, editor and compact
+  large-font detail renders. Synthetic preview data remains only in ignored work/.
+- assembleDebug and lintDebug succeeded; Android lint has zero errors.
+- No physical-device/live-Google vendor round-trip verification performed here;
+  acceptance steps are documented in docs/GOOGLE_SHEETS_SETUP.md.
+- APK: app/build/outputs/apk/debug/app-debug.apk.
+- No GitHub push or Drive upload requested for this task; commit remains local.
+
+REMAINING
+Reports, physical counts, receiving/adjustments, product lifecycle and staff
+permissions remain pending. Vendor payments, purchase orders and settlement
+are not implemented. POS transactions remain outside current scope; automatic
+sync remains last priority. Existing manual sync/conflict safeguards remain.

@@ -19,17 +19,22 @@ import androidx.compose.ui.unit.sp
 import com.paninda.app.R
 import com.paninda.app.domain.model.*
 import com.paninda.app.ui.ShopViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.paninda.app.ui.vendors.ProductVendorField
 import com.paninda.app.ui.components.*
 import com.paninda.app.ui.theme.Palette
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.Dispatchers
 
 @Composable
-fun ProductEditorScreen(productId: String?, products: List<Product>, vm: ShopViewModel, onBack: () -> Unit) {
+fun ProductEditorScreen(productId: String?, products: List<Product>, vm: ShopViewModel, onBack: () -> Unit, initialVendorId: String? = null) {
     val product = products.find { it.id == productId }
+    val shop by vm.state.collectAsStateWithLifecycle()
+    val initialVendor = shop.vendors.find { it.id == (product?.vendorId ?: initialVendorId) }
+    var vendorId by rememberSaveable(productId) { mutableStateOf(product?.vendorId ?: initialVendorId) }
     var name by rememberSaveable(productId) { mutableStateOf(product?.name.orEmpty()) }
     var sku by rememberSaveable(productId) { mutableStateOf(product?.sku.orEmpty()) }
-    var vendor by rememberSaveable(productId) { mutableStateOf(product?.vendorName.orEmpty()) }
+    var vendor by rememberSaveable(productId) { mutableStateOf(initialVendor?.name ?: product?.vendorName.orEmpty()) }
     var category by rememberSaveable(productId) { mutableStateOf(product?.category.orEmpty()) }
     var price by rememberSaveable(productId) { mutableStateOf(product?.unitPriceMinor?.let(Money::editable).orEmpty()) }
     var quantity by rememberSaveable(productId) { mutableStateOf("0") }
@@ -38,10 +43,10 @@ fun ProductEditorScreen(productId: String?, products: List<Product>, vm: ShopVie
     var saving by remember { mutableStateOf(false) }
     var discard by rememberSaveable { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
-    val original = ProductDraft(product?.name.orEmpty(), product?.sku.orEmpty(), product?.vendorName.orEmpty(),
+    val original = remember(productId, initialVendorId) { ProductDraft(product?.name.orEmpty(), product?.sku.orEmpty(), initialVendor?.name ?: product?.vendorName.orEmpty(),
         product?.category.orEmpty(), product?.unitPriceMinor?.let(Money::editable).orEmpty(), "0",
-        product?.lowStockThreshold?.toString() ?: "0")
-    val draft = ProductDraft(name, sku, vendor, category, price, quantity, threshold)
+        product?.lowStockThreshold?.toString() ?: "0", product?.vendorId ?: initialVendorId) }
+    val draft = ProductDraft(name, sku, vendor, category, price, quantity, threshold, vendorId)
     val dirty = draft != original
     val back = { if (dirty) discard = true else onBack() }
     BackHandler(enabled = dirty && !saving) { discard = true }
@@ -61,6 +66,7 @@ fun ProductEditorScreen(productId: String?, products: List<Product>, vm: ShopVie
                         is SaveProductResult.Saved -> onBack()
                         SaveProductResult.Invalid -> error = R.string.product_editor_invalid
                         SaveProductResult.DuplicateSku -> error = R.string.product_editor_duplicate
+                        SaveProductResult.VendorUnavailable -> error = R.string.vendor_picker_unavailable
                         SaveProductResult.Missing -> error = R.string.product_editor_missing
                         SaveProductResult.Failed -> error = R.string.common_action_failed
                     }
@@ -81,7 +87,9 @@ fun ProductEditorScreen(productId: String?, products: List<Product>, vm: ShopVie
             item { EditorField(name, { name = it.take(120) }, R.string.product_editor_name, enabled = !saving) }
             item { EditorField(sku, { sku = it.take(64) }, R.string.product_editor_sku,
                 keyboard = KeyboardOptions(capitalization = KeyboardCapitalization.Characters), enabled = !saving) }
-            item { EditorField(vendor, { vendor = it.take(120) }, R.string.product_editor_vendor, enabled = !saving) }
+            item { ProductVendorField(vendor, { vendor = it.take(120); vendorId = null }, vendorId, shop.vendors, !saving) {
+                vendor = it.name; vendorId = it.id
+            } }
             item { EditorField(category, { category = it.take(80) }, R.string.product_editor_category, enabled = !saving) }
             item { EditorField(price, { price = it.take(10) }, R.string.product_editor_price,
                 keyboard = KeyboardOptions(keyboardType = KeyboardType.Decimal), enabled = !saving) }

@@ -7,7 +7,7 @@
     <string name="settings_disconnect_title">Disconnect Google Sheets?</string>
     <string name="settings_disconnect_body">Revoke this app’s Google access and return to onboarding? Your local records, pending changes and Drive file will be kept. An internet connection is needed to revoke access.</string>
     <string name="settings_reset_title">Reset local data?</string>
-    <string name="settings_reset_body">Delete all local products, receipts, stock movements and pending changes? Unsynced records will be lost. The Drive file will not be deleted. A later sync can restore its records to this device.</string>
+    <string name="settings_reset_body">Delete all local vendors, products, receipts, stock movements and pending changes? Unsynced records will be lost. The Drive file will not be deleted. A later sync can restore its records to this device.</string>
     <string name="settings_reset_confirm">Delete local data</string>
     <string name="settings_disconnect_confirm">Disconnect</string>
     <string name="settings_reset_done">Local data cleared.</string>

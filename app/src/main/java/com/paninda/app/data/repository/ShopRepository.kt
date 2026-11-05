@@ -15,12 +15,12 @@ import com.paninda.app.data.sync.WorkbookBinding
 class ShopRepository(private val db: PanindaDatabase, private val clock: Clock = Clock.systemUTC()) {
     private val dao = db.shopDao()
     val state = combine(dao.observeProducts(), dao.observeTransactions(),
-        dao.observePendingCount(), dao.observeState()) { products, transactions, pending, settings ->
+        dao.observePendingCount(), dao.observeState(), dao.observeVendors()) { products, transactions, pending, settings, vendors ->
         val values = settings.associate { it.key to it.value }
         ShopState(loading = values["initialized"] != "true", connected = values["connected"] == "true" && !values["workbook_id"].isNullOrBlank(),
             products = products.map { it.toDomain() }, transactions = transactions.map { it.toDomain() },
             pendingCount = pending, lastCheckedAt = values["last_checked"]?.toLongOrNull(),
-            workbookName = values["workbook_name"], accountEmail = values["account_email"],
+            vendors = vendors.map { it.toDomain() }, workbookName = values["workbook_name"], accountEmail = values["account_email"],
             syncStatus = if (pending > 0 && values["sync_status"] == "synced") "pending" else values["sync_status"] ?: "idle")
     }
 
@@ -54,7 +54,7 @@ class ShopRepository(private val db: PanindaDatabase, private val clock: Clock =
         if (download && !unchanged) throw com.paninda.app.data.sync.SyncConflictException()
         if (download) {
             clearBusinessData()
-            remote.vendors.forEach { dao.putVendor(VendorEntity(it.id, it.name)) }
+            remote.vendors.forEach { dao.putVendor(it.toEntity()) }
             remote.products.forEach { dao.putProduct(it.toEntity()) }
             dao.putTransactions(remote.transactions.map { it.toEntity() })
             dao.putItems(remote.items.map { it.toEntity() })
@@ -92,7 +92,7 @@ class ShopRepository(private val db: PanindaDatabase, private val clock: Clock =
     suspend fun items(transactionId: String) = dao.items(transactionId).map { it.toDomain() }
     suspend fun movements(productId: String) = dao.productMovements(productId).map { it.toDomain() }
     suspend fun snapshot() = db.withTransaction {
-        ShopSnapshot(dao.vendors().map { Vendor(it.id, it.name) }, dao.products().map { it.toDomain() },
+        ShopSnapshot(dao.vendors().map { it.toDomain() }, dao.products().map { it.toDomain() },
             dao.transactions().map { it.toDomain() }, dao.allItems().map { it.toDomain() },
             dao.movements().map { it.toDomain() })
     }
@@ -116,7 +116,11 @@ class ShopRepository(private val db: PanindaDatabase, private val clock: Clock =
                 val duplicate = dao.productBySku(sku)
                 if (duplicate != null && duplicate.id != id) return@withTransaction SaveProductResult.DuplicateSku
                 val now = clock.millis()
-                val vendor = dao.vendorByName(vendorName) ?: VendorEntity(UUID.randomUUID().toString(), vendorName).also {
+                val selected = if (draft.vendorId != null) dao.vendor(draft.vendorId)
+                    ?: return@withTransaction SaveProductResult.VendorUnavailable else dao.vendors().firstOrNull { it.name.equals(vendorName, true) }
+                if (selected?.isActive == false && existing?.vendorId != selected.id)
+                    return@withTransaction SaveProductResult.VendorUnavailable
+                val vendor = selected ?: VendorEntity(UUID.randomUUID().toString(), vendorName, updatedAt = now).also {
                     dao.putVendor(it)
                     queue("vendor", it.id, now)
                 }
@@ -138,6 +142,42 @@ class ShopRepository(private val db: PanindaDatabase, private val clock: Clock =
             SaveProductResult.Failed
         }
     }
+
+    suspend fun saveVendor(id: String?, draft: VendorDraft): SaveVendorResult {
+        val clean = VendorDraft(draft.name.trim(), draft.contactPerson.trim(), draft.phone.trim(),
+            draft.email.trim(), draft.address.trim(), draft.notes.trim())
+        if (clean.name.isBlank() || clean.name.length > 120 || clean.contactPerson.length > 120 ||
+            clean.phone.length > 40 || clean.email.length > 254 || clean.address.length > 300 || clean.notes.length > 1000 ||
+            (clean.email.isNotEmpty() && !Regex("[^\\s@]+@[^\\s@]+\\.[^\\s@]+").matches(clean.email))) return SaveVendorResult.Invalid
+        return try {
+            db.withTransaction {
+                val existing = id?.let { dao.vendor(it) }
+                if (id != null && existing == null) return@withTransaction SaveVendorResult.Missing
+                val duplicate = dao.vendors().firstOrNull { it.name.equals(clean.name, true) && it.id != id }
+                if (duplicate != null) return@withTransaction SaveVendorResult.DuplicateName
+                val now = clock.millis()
+                val vendorId = id ?: UUID.randomUUID().toString()
+                dao.putVendor(VendorEntity(vendorId, clean.name, clean.contactPerson, clean.phone,
+                    clean.email, clean.address, clean.notes, existing?.isActive ?: true, now, (existing?.version ?: 0) + 1))
+                queue("vendor", vendorId, now)
+                SaveVendorResult.Saved(vendorId)
+            }
+        } catch (e: CancellationException) { throw e }
+        catch (_: Exception) { SaveVendorResult.Failed }
+    }
+
+    suspend fun setVendorActive(id: String, active: Boolean): SaveVendorResult = try {
+        db.withTransaction {
+            val vendor = dao.vendor(id) ?: return@withTransaction SaveVendorResult.Missing
+            if (vendor.isActive != active) {
+                val now = clock.millis()
+                dao.putVendor(vendor.copy(isActive = active, updatedAt = now, version = vendor.version + 1))
+                queue("vendor", id, now)
+            }
+            SaveVendorResult.Saved(id)
+        }
+    } catch (e: CancellationException) { throw e }
+    catch (_: Exception) { SaveVendorResult.Failed }
 
     private suspend fun queue(type: String, id: String, now: Long) =
         dao.putPending(PendingChangeEntity("$type:$id", type, id, "UPSERT", now))

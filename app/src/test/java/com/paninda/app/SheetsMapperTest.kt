@@ -14,11 +14,15 @@ class SheetsMapperTest {
     }
 
     @Test fun roundTripAcceptsReorderedHeadersAndKeepsHistoricalPrices() {
-        val original = TestFixtures.snapshot()
+        val original = TestFixtures.snapshot().let { snapshot -> snapshot.copy(vendors = snapshot.vendors.map {
+            it.copy(contactPerson = "Contact", phone = "+63 900 123 4567", email = "vendor@example.invalid",
+                address = "Malolos", notes = "Vendor notes", isActive = false, updatedAt = TestFixtures.now, version = 3)
+        }) }
         val tables = SheetsMapper.toTables(original).map {
             it.copy(headers = it.headers.reversed(), rows = it.rows.map(List<String>::reversed))
         }
         val restored = SheetsMapper.fromTables(tables)
+        assertEquals(original.vendors, restored.vendors)
         assertEquals(original.products, restored.products)
         assertEquals(original.items, restored.items)
         assertEquals(10000L, restored.transactions.single().totalMinor)
@@ -35,7 +39,7 @@ class SheetsMapperTest {
             change(tables, "SaleItems", "product_id", "missing"),
             change(tables, "Products", "unit_price_minor", "123.45"),
             change(tables, "Sales", "total_minor", "9999"),
-            change(tables, "Meta", "value", "2"),
+            change(tables, "Meta", "value", "999"),
         )
         invalid.forEach { workbook ->
             assertThrows(WorkbookFormatException::class.java) { SheetsMapper.fromTables(workbook) }

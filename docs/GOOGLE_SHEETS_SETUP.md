@@ -1,4 +1,4 @@
-# Google Sheets connection — litmus_2
+# Google Sheets connection — litmus_3
 
 ## Google Cloud setup
 
@@ -69,9 +69,9 @@ Use a physical Android device with up-to-date Google Play services, a browser an
    empty app worksheets; other worksheets and their data remain unchanged.
 5. Select a compliant file: connect directly without a compatibility warning.
    Invalid existing (Paninda) headers/records fail validation rather than being
-   overwritten. A complete valid legacy layout from the previous APK is renamed
-   in place with `(Paninda)` suffixes. Earlier APKs expect the old names; use the
-   current APK after migration.
+   overwritten. This branch uses a fresh schema and does not upgrade older app
+   worksheets or rename unsuffixed worksheets. Uninstall for a clean database
+   and create a new file or fresh app worksheets when testing.
 6. Create a product offline, restart, then Sync Now online. Check SKU, minor-unit
    price, vendor and opening movement. Remote-only valid edits should import;
    divergent local/remote edits must stop with Settings conflict suggestions.
@@ -83,6 +83,13 @@ Use a physical Android device with up-to-date Google Play services, a browser an
    per device. A local reset discards unsynced device records, never the remote
    file. Empty valid app worksheets can receive retained local records safely;
    different nonempty copies without a common baseline require conflict review.
+
+10. Tools → Vendors: create/edit a vendor offline with optional contacts/notes,
+    link a product, rename the vendor and confirm stock/history stay intact.
+    Archive it: existing links remain, new product assignments are blocked.
+    Restore it and confirm assignments work again. Sync Now and inspect all ten
+    `Vendors (Paninda)` columns; on a separate clean install connect the same
+    current-schema file to verify contacts, links and archive state import.
 
 ## Sync and recovery limits
 

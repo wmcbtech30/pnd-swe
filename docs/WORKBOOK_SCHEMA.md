@@ -5,7 +5,7 @@ to create, read and write app-owned workbooks; Room remains the working store.
 
 Each table occupies its own worksheet, named with a ` (Paninda)` suffix (for
 example, `Products (Paninda)`). Internal mapper table keys remain `Products`,
-etc., so domain snapshot fingerprints do not change during the name migration. Headers start at A1 in row 1; records
+etc. Headers start at A1 in row 1; records
 start at row 2. One record occupies one row. No merged cells, title rows, or
 subtotal rows belong inside these tables. Worksheet names and header names are
 case-sensitive. The pure mapper accepts reordered columns and additional named columns, but
@@ -15,7 +15,7 @@ original exact header order, preventing writes from reassigning manual columns.
 | Worksheet | Headers, left to right from A1 |
 | --- | --- |
 | Meta (Paninda) | `key, value` |
-| Vendors (Paninda) | `vendor_id, name` |
+| Vendors (Paninda) | `vendor_id, name, contact_person, phone, email, address, notes, is_active, updated_at, version` |
 | Products (Paninda) | `product_id, sku, name, vendor_id, category, unit_price_minor, low_stock_threshold, is_active, updated_at, version` |
 | Sales (Paninda) | `sale_id, receipt_number, sold_at, cashier_name, payment_method, total_minor, amount_tendered_minor, item_count` |
 | SaleItems (Paninda) | `sale_item_id, sale_id, product_id, product_name_snapshot, vendor_id_snapshot, quantity, unit_price_minor` |
@@ -30,6 +30,12 @@ shop_timezone   Asia/Manila
 ```
 
 - IDs are stable text identifiers, never row numbers. App-created IDs are UUIDs.
+- Vendor name is required (maximum 120 characters) and unique ignoring case,
+  including archived vendors. Optional contact person: 120 characters; phone: 40;
+  email: 254 with basic email-format validation; address: 300; notes: 1000.
+  Text is trimmed. Archive/restore changes `is_active`; stable IDs preserve
+  product links and receipt snapshots. New product links require an active vendor.
+  Existing links to an archived vendor may be retained during product edits.
 - SKU is a unique uppercase string of 1–64 letters, digits, periods, underscores,
   or hyphens. SKU is text even when it contains only digits.
 - Money is a nonnegative integer number of centavos. `950` means Php9.50.
@@ -61,3 +67,8 @@ reordered headers for future import workflows. Existing-file setup checks for mi
 It adds only app worksheets after any required warning; unrelated data is not
 imported into the domain model. See GOOGLE_SHEETS_SETUP.md for sync
 conflict policy, single-writer limits and connection setup.
+
+This prototype uses a fresh version-1 schema, including all ten vendor columns.
+There are no schema upgrades, migrations, unsuffixed worksheet renames or legacy
+header support. Use a fresh installation and new app worksheets for testing; an
+older two-column Vendors worksheet is rejected rather than converted.
