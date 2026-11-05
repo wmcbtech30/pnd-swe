@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="home_greeting_morning">Good Morning</string>
-    <string name="home_greeting_afternoon">Good Afternoon</string>
-    <string name="home_greeting_evening">Good Evening</string>
     <string name="home_today_sales">Today’s Sales</string>
     <string name="home_total">TOTAL</string>
     <string name="home_currency">Php</string>
@@ -16,5 +13,4 @@
     <string name="home_refresh">Check sync status</string>
     <string name="home_recent_empty">Your recent receipts will appear here.</string>
     <string name="home_recent_line">%1$s · %2$s · Php%3$s</string>
-    <string name="home_local_first">LOCAL FIRST · GOOGLE SHEETS</string>
 </resources>

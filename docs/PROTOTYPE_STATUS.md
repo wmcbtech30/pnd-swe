@@ -1,7 +1,7 @@
 # Prototype status
 
 Branch: `litmus_2`, continuing the clean local-first prototype on `litmus_1`.
-Historical decisions and checks remain in `logs/log-rev000.log` through 004.
+Historical decisions and checks remain in `logs/log-rev000.log` through 005.
 
 ## Implemented
 
@@ -33,6 +33,18 @@ Historical decisions and checks remain in `logs/log-rev000.log` through 004.
   later sync can restore remote data, or block if new local data conflicts.
 - Google logo remains the requested blank placeholder. Excel is removed and
   Custom Database remains disabled. Business fixtures exist only under tests.
+
+- Home shows the last successful sync date/time through a shared read-only
+  `ShopState.syncSummary` getter and common sync presentation helpers. Successful
+  sync uses a checkmark; pending/in-progress states use sync icons, and warnings
+  are reserved for errors/conflicts.
+- Time-based Home microcopy cycles across cold launches, stays stable during
+  navigation/recreation, and switches to the appropriate Manila-time pool when
+  the time period changes. Editable phrases live in `strings_microcopies.xml`;
+  pools/selection rules live in `ui/home/Microcopies.kt`.
+- System chrome follows the app’s light theme even when the device uses dark
+  mode. Dark status/navigation controls remain visible against the light app;
+  older Android versions without dark navigation icons use a dark fallback bar.
 
 ## Operational limits and pending work
 
@@ -75,6 +87,6 @@ Google Cloud registration, official references and device acceptance steps.
 
 ## Verification
 
-Keep iteration lean: the existing thirteen focused checks plus three worksheet-inspection
-checks. No maintained screenshot baselines, layout assertions or device matrix.
-Build/lint/regression results for this revision are recorded in log-rev004.
+Keep iteration lean: eighteen focused checks covering existing data flows, worksheet inspection,
+sync presentation and launch-based greeting rotation. No maintained screenshot baselines, layout assertions or device matrix.
+Build/lint/regression results for this revision are recorded in log-rev005.

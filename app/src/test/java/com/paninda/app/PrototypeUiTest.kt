@@ -31,12 +31,12 @@ class PrototypeUiTest {
         compose.onNodeWithText("View all").performSemanticsAction(SemanticsActions.OnClick) { it() }
         awaitText("Search receipt number")
         compose.onNodeWithContentDescription("Home").performClick()
-        awaitText("LOCAL FIRST · GOOGLE SHEETS")
+        awaitHome()
         compose.onNodeWithText("Search receipt number").assertDoesNotExist()
         compose.onNodeWithContentDescription("History").performClick()
         awaitText("Search receipt number")
         compose.onNodeWithContentDescription("Home").performClick()
-        awaitText("LOCAL FIRST · GOOGLE SHEETS")
+        awaitHome()
         compose.onNodeWithContentDescription("Inventory").performClick()
         compose.onNodeWithText("New Product").performClick()
         fill("Product name", "Test Notebook")
@@ -58,10 +58,15 @@ class PrototypeUiTest {
         assertEquals(ShopSnapshot(), runBlocking { repo.snapshot() })
     }
 
+    private fun awaitHome() {
+        compose.waitUntil(8_000) {
+            compose.onAllNodesWithContentDescription("Check sync status").fetchSemanticsNodes().isNotEmpty()
+        }
+    }
     private fun connect() {
         // Fixture binding only: this smoke check must never launch real Google consent.
         runBlocking { TestFixtures.connect(repo) }
-        awaitText("LOCAL FIRST · GOOGLE SHEETS")
+        awaitHome()
     }
     private fun settings() {
         compose.onNodeWithContentDescription("Tools").performClick()

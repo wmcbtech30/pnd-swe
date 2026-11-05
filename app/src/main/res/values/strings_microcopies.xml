@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="micro_morning_1">Good Morning</string>
+    <string name="micro_morning_2">Ready na ba?</string>
+    <string name="micro_morning_3">Rise and shine</string>
+    <string name="micro_morning_4">Early grind</string>
+    <string name="micro_morning_5">Kape muna tayo</string>
+    <string name="micro_lunch_1">Lunch break?</string>
+    <string name="micro_lunch_2">Tanghalian Na</string>
+    <string name="micro_lunch_3">Working thru lunch?</string>
+    <string name="micro_afternoon_1">Good afternoon</string>
+    <string name="micro_afternoon_2">Kaya pa ba?</string>
+    <string name="micro_afternoon_3">Kamusta benta today?</string>
+    <string name="micro_evening_1">Good evening</string>
+    <string name="micro_evening_2">Gabi na, working pa?</string>
+    <string name="micro_evening_3">Magkano na for 2day?</string>
+    <string name="micro_evening_4">Progress?</string>
+    <string name="micro_evening_5">Wrapping up soon?</string>
+    <string name="micro_late_1">Working late?</string>
+    <string name="micro_late_2">Shift vibes?</string>
+    <string name="micro_late_3">Late Night Grinding?</string>
+</resources>

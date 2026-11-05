@@ -2,8 +2,8 @@
 <resources>
     <string name="sync_title">Sync Status</string>
     <string name="sync_explanation">Changes are saved on this device first. Tap Sync Now to exchange changes with your file. Internet and Google authorization are required only for connection and sync.</string>
-    <string name="sync_never">No cloud sync has been performed</string>
-    <string name="sync_checked">LAST SYNCED AT %1$s</string>
+    <string name="sync_never">Last sync: Never</string>
+    <string name="sync_checked">Last sync: %1$s</string>
     <string name="sync_tools">SYNC TOOLS</string>
     <string name="sync_now">Sync Now</string>
     <plurals name="sync_pending_count">

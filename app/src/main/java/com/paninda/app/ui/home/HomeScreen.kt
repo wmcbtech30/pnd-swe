@@ -24,7 +24,7 @@ import com.paninda.app.R
 import com.paninda.app.domain.model.*
 import com.paninda.app.ui.components.*
 import com.paninda.app.ui.theme.*
-import java.time.LocalTime
+import com.paninda.app.ui.sync.lastSyncText
 
 @Composable
 fun HomeScreen(state: ShopState, onSell: () -> Unit, onHistory: () -> Unit,
@@ -33,12 +33,7 @@ fun HomeScreen(state: ShopState, onSell: () -> Unit, onHistory: () -> Unit,
     val transactions = state.transactions.filter { DateFilter().matches(it, today) }
     val low = state.products.count { it.isActive && it.isLowStock }
     val out = state.products.count { it.isActive && it.isOutOfStock }
-    val greeting = when (LocalTime.now(ShopZone).hour) {
-        in 0..11 -> R.string.home_greeting_morning
-        in 12..17 -> R.string.home_greeting_afternoon
-        else -> R.string.home_greeting_evening
-    }
-    PageScaffold(title = stringResource(greeting), subtitle = stringResource(R.string.home_local_first),
+    PageScaffold(title = rememberHomeGreeting(), subtitle = lastSyncText(state.syncSummary),
         actions = {
             IconButton(onSync) { Icon(Icons.Default.Refresh, stringResource(R.string.home_refresh),
                 Modifier.size(32.dp), tint = Palette.Icon) }

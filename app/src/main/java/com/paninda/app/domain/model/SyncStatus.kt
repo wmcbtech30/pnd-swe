@@ -1,0 +1,21 @@
+package com.paninda.app.domain.model
+
+enum class SyncPhase { READY, SYNCED, PENDING, CONFLICT, INCOMPATIBLE, ACCESS, FAILED, SYNCING }
+
+data class SyncSummary(val phase: SyncPhase, val lastSuccessfulAt: Long?, val pendingCount: Int)
+
+/** Shared read-only status for Home, Settings and Sync. Attempts/failures never invent a success time. */
+val ShopState.syncSummary: SyncSummary
+    get() = SyncSummary(when (syncStatus) {
+        "synced" -> when {
+            pendingCount > 0 -> SyncPhase.PENDING
+            lastCheckedAt != null -> SyncPhase.SYNCED
+            else -> SyncPhase.READY
+        }
+        "pending" -> SyncPhase.PENDING
+        "conflict" -> SyncPhase.CONFLICT
+        "incompatible" -> SyncPhase.INCOMPATIBLE
+        "access" -> SyncPhase.ACCESS
+        "failed" -> SyncPhase.FAILED
+        else -> SyncPhase.READY
+    }, lastCheckedAt, pendingCount)

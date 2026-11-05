@@ -1,0 +1,54 @@
+Paninda revision 005 — sync presentation, light system chrome and rotating Home copy
+Date: 2026-11-05 (UTC)
+Branch: litmus_2
+Base: 441863f
+
+REQUEST
+Successful sync should show a checkmark, Home subtitle should show last sync via
+separate getter logic, system navigation controls should remain visible in the
+light-only app, and time-based microcopy should rotate across app launches.
+
+IMPLEMENTED
+- Added domain/model/SyncStatus.kt: a read-only ShopState.syncSummary getter with
+  typed phases, pending count and lastSuccessfulAt. A persisted success status
+  without an actual timestamp is treated as Ready, not a fabricated success.
+  Pending changes and failures/conflicts retain the last successful timestamp.
+- SyncStatusScreen uses CheckCircle after successful sync, Sync for pending/
+  in-progress work, a neutral cloud for Ready, and WarningAmber only for actual
+  failures, access/format issues or conflicts. Existing monochrome palette kept.
+- ui/sync/SyncPresentation.kt centralizes status labels and last-sync formatting
+  for Home, Sync Status and Settings. Date plus time uses the shop's Manila zone;
+  missing history reads "Last sync: Never". No API call occurs in the getter.
+  The existing internal lastCheckedAt field/key still holds completed-sync time;
+  no Room schema migration or new successful timestamp is introduced.
+- Home subtitle now uses last sync, replacing the static LOCAL FIRST label.
+- Removed the leftover values-night native theme, which selected a dark window
+  and light controls even though Compose always renders light. MainActivity now
+  explicitly requests light system-bar styling/dark status/navigation controls,
+  independent of device dark mode. Pre-26 devices use the supported dark scrim
+  fallback where dark navigation controls are unavailable.
+- Added ui/home/Microcopies.kt and strings_microcopies.xml containing all 19
+  supplied phrases. Corrected obvious "RIse" and "Gridning" typos only.
+  Manila-time pools: morning 05:00–10:59, lunch 11:00–12:59, afternoon 13:00–16:59,
+  evening 17:00–21:59, late night 22:00–04:59.
+- A single application-scoped rotation instance caches the selection for each
+  time period. SharedPreferences remembers each pool's last index across cold
+  launches, cycling without repeats until the pool wraps. Returning to Home,
+  recomposing or recreating the activity does not advance the phrase. A lifecycle-
+  aware minute check updates the pool while Home is visible and on resume.
+- Updated the existing navigation behavior smoke check to locate Home by its
+  sync action instead of the removed static subtitle. Added two focused tests
+  for success/pending/failure getters and time boundaries/launch rotation.
+- No maintained layout tests, screenshot baselines or device-size matrix added.
+
+VERIFICATION
+- Build, lint and 18 maintained focused checks are being run; results below.
+- System gesture/button appearance still benefits from acceptance on the target
+  physical device/OEM. No emulator/device screenshot claim is made.
+
+FINAL CHECKS
+- assembleDebug + lintDebug completed successfully. Android lint: 0 errors.
+- All 18 maintained regression checks passed (0 failures/errors), including the
+  existing navigation/product behavior smoke check with the dynamic Home header.
+- Debug APK: app/build/outputs/apk/debug/app-debug.apk. No remote Git push or Drive
+  upload requested for this UI revision; changes are committed locally.
