@@ -1,5 +1,6 @@
 package com.paninda.app.ui.onboarding
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
@@ -23,6 +25,8 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -46,10 +50,9 @@ private val PromptFont = FontFamily(Font(R.font.ibm_plex_sans_regular))
 private val ButtonFont = FontFamily(Font(R.font.roboto_regular))
 private val GoogleBlue = Color(0xFF0B63D7)
 private val LockedGray = Color(0xFF989898)
-private val HeroGradient = Brush.verticalGradient(
-    0f to Color(0xFF63ADC8),
-    0.44231f to Color(0xFF63ADC8),
-    1f to Color(0xFF0084FF),
+private val HeroTextScrim = Brush.verticalGradient(
+    0f to Color.Black.copy(alpha = 0.35f),
+    1f to Color.Black.copy(alpha = 0.65f),
 )
 
 @Composable
@@ -71,9 +74,15 @@ fun OnboardingScreen(modifier: Modifier = Modifier, onContinue: () -> Unit = {})
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Box(
-                modifier = Modifier.fillMaxWidth().height(heroHeight).background(HeroGradient),
+                modifier = Modifier.fillMaxWidth().height(heroHeight),
                 contentAlignment = Alignment.BottomCenter,
             ) {
+                val background = rememberOnboardingImage(R.drawable.onboarding_welcome_background, maxEdge = 2048)
+                if (background != null) Image(
+                    bitmap = background, contentDescription = null,
+                    modifier = Modifier.matchParentSize(), contentScale = ContentScale.Crop,
+                )
+                Box(Modifier.matchParentSize().background(HeroTextScrim))
                 Column(
                     modifier = Modifier.padding(horizontal = 24.dp, vertical = 39.dp * scale),
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -132,10 +141,17 @@ fun OnboardingScreen(modifier: Modifier = Modifier, onContinue: () -> Unit = {})
                     ),
                     contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
                 ) {
-                    // Reserved for the Google logo once the asset source is available.
                     Box(
-                        modifier = Modifier.size(30.dp).background(Color.White, CircleShape),
-                    )
+                        modifier = Modifier.size(30.dp).clip(CircleShape).background(Color.White),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        val logo = rememberOnboardingImage(R.drawable.google_g_logo, maxEdge = 512)
+                        if (logo != null) Image(
+                            bitmap = logo, contentDescription = null,
+                            // The supplied original has transparent padding; its visible G is ~18dp.
+                            modifier = Modifier.requiredSize(55.dp), contentScale = ContentScale.Fit,
+                        )
+                    }
                     Spacer(Modifier.width(10.dp))
                     Text(
                         text = stringResource(R.string.onboarding_google_sheets),

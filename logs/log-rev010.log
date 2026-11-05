@@ -1,0 +1,44 @@
+Paninda revision 010 — welcome photo and Google logo assets
+Date: 2026-11-05 (UTC)
+Branch: litmus_3
+Base: f17503f
+
+REQUEST
+Use the onboarding welcome photo and Google Brand Center PNG from the Paninda
+Drive folder, and store them in appropriate source asset folders. Welcome photo
+must have a dark tint for contrast; the other onboarding screens keep blue gradients.
+
+IMPLEMENTED
+- Downloaded the two user-provided original files through the Drive connector.
+  Bundled unchanged under app/src/main/res/drawable-nodpi:
+  onboarding_welcome_background.jpg (6048x4024 JPEG, 2,544,679 bytes)
+  google_g_logo.png (2820x2820 transparent PNG, 137,714 bytes)
+- Welcome banner uses the photo with responsive center crop and a black overlay
+  (35% at top to 65% at bottom) behind the existing white brand/tagline text.
+  Shared ConnectionPage and subsequent setup/error screens keep their blue gradient.
+- Google button replaces its blank placeholder with the supplied original PNG.
+  Original transparent padding is accommodated at render time so the visible G
+  measures approximately 18dp inside the existing 30dp white circular container.
+  No logo tint, recoloring, source cropping or image regeneration applied.
+- Separate onboarding bitmap helper samples the large originals and decodes on
+  Dispatchers.IO. nodpi prevents automatic density inflation; resources are
+  bundled for offline display, with no Drive URLs or new image-loading dependency.
+- Added asset provenance/usage in docs/ASSETS.md and updated prototype status.
+  Existing button action/authentication, data and schemas are unchanged.
+
+VERIFICATION
+Build/lint and temporary visual inspection results appended after completion.
+No maintained layout tests or new business-logic tests for this asset-only change.
+No GitHub push or Drive upload requested for these source changes.
+
+FINAL CHECKS
+- assembleDebug + lintDebug passed; Android lint: zero errors.
+- Existing end-to-end behavior smoke passed, including clean onboarding startup
+  and existing local inventory, vendor, reports, sale/count and reset workflows.
+- Three ignored temporary captures passed and were inspected: welcome at normal
+  size, compact welcome with 1.5x text, and the following file-source page.
+  Photo remains darkened with readable white branding; Google G is visible and
+  keeps its aspect ratio/colors. Following onboarding page retains blue gradient.
+- Verified both bundled assets are byte-for-byte identical to the Drive originals.
+- No maintained layout tests or image-generation/editing pipeline added.
+- APK rebuilt locally. No GitHub push or Drive upload requested in this turn.

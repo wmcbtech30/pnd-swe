@@ -1,7 +1,7 @@
 # Prototype status
 
 Branch: `litmus_3`, continuing the local-first prototype from `litmus_2`.
-Historical decisions and checks remain in `logs/log-rev000.log` through 009.
+Historical decisions and checks remain in `logs/log-rev000.log` through 010.
 
 ## Implemented
 
@@ -31,8 +31,11 @@ Historical decisions and checks remain in `logs/log-rev000.log` through 009.
 - Confirmed local reset discards device business records/outbox, preserves the
   connection, and invalidates the baseline. It never deletes the remote workbook;
   later sync can restore remote data, or block if new local data conflicts.
-- Google logo remains the requested blank placeholder. Excel is removed and
-  Custom Database remains disabled. Business fixtures exist only under tests.
+- Welcome uses the supplied warehouse photo with a dark contrast overlay, and
+  the Google button uses the supplied Brand Center PNG. Both originals are
+  bundled in drawable-nodpi with sampled decoding. Other onboarding pages retain
+  their blue gradient. Excel is removed and Custom Database remains disabled.
+  Business fixtures exist only under tests.
 
 - Home shows the last successful sync date/time through a shared read-only
   `ShopState.syncSummary` getter and common sync presentation helpers. Successful
@@ -129,4 +132,4 @@ Keep iteration lean: twenty-five focused checks covering existing data flows, wo
 sync presentation, launch-based greeting rotation, vendor lifecycle rules and
 inventory-report calculations and atomic sale/count recording. No maintained screenshot baselines, layout
 assertions or device matrix.
-Build/lint/regression results for this revision are recorded in log-rev009.
+Build/lint/regression results for this revision are recorded in log-rev010.
