@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="new_file_title">New file</string>
-    <string name="new_file_body">Create a Google Sheets file in your Drive with six worksheets named with (Paninda). Records saved on this device will be synced to those worksheets. Your other files stay unchanged.</string>
+    <string name="new_file_body">Create a Google Sheets file in your Drive with eight worksheets named with (Paninda). Records saved on this device will be synced to those worksheets. Your other files stay unchanged.</string>
     <string name="new_file_default_name">Paninda</string>
     <string name="new_file_create">Create file</string>
     <string name="new_file_name">File name</string>

@@ -19,6 +19,8 @@ original exact header order, preventing writes from reassigning manual columns.
 | Products (Paninda) | `product_id, sku, name, vendor_id, category, unit_price_minor, low_stock_threshold, is_active, updated_at, version` |
 | Sales (Paninda) | `sale_id, receipt_number, sold_at, cashier_name, payment_method, total_minor, amount_tendered_minor, item_count` |
 | SaleItems (Paninda) | `sale_item_id, sale_id, product_id, product_name_snapshot, vendor_id_snapshot, quantity, unit_price_minor` |
+| StockCounts (Paninda) | `count_id, counted_at, counted_by, notes` |
+| StockCountItems (Paninda) | `count_item_id, count_id, product_id, product_name_snapshot, sku_snapshot, vendor_id_snapshot, expected_quantity, counted_quantity` |
 | StockMovements (Paninda) | `movement_id, product_id, quantity_delta, movement_type, source_id, occurred_at, reason` |
 
 Required metadata:
@@ -41,9 +43,10 @@ shop_timezone   Asia/Manila
 - Money is a nonnegative integer number of centavos. `950` means Php9.50.
 - Counts, quantities, and versions are whole numbers. Versions start at 1.
 - Timestamps are ISO 8601 UTC strings, such as the output of `Instant.toString()`.
-- `is_active` is TRUE or FALSE. Payment method is CASH or MANUAL_OTHER.
+- `is_active` is TRUE or FALSE. Payment method is CASH, MANUAL_OTHER or NOT_RECORDED.
 - Cash receipts require `amount_tendered_minor` at least equal to `total_minor`.
-  A manually recorded non-cash payment may leave the tendered cell empty.
+  MANUAL_OTHER can leave tendered empty. App-recorded completed sales use
+  NOT_RECORDED with an empty tendered cell: payment is neither collected nor verified.
 - Receipt item counts represent total units across the lines. Receipt totals
   must exactly match the sum of quantity multiplied by historical unit price.
 - Stock quantity is derived from signed movement deltas; it is not an editable
@@ -56,7 +59,27 @@ shop_timezone   Asia/Manila
   workbook columns. Parsing a remote workbook record can acknowledge that local
   copy; it cannot establish that an upload succeeded.
 
-This contract covers product metadata, stock movements, and completed receipts.
+- Completed-sale recording saves Sales/SaleItems plus one negative SALE movement
+  per product, with source_id equal to sale_id. Products retain stable IDs; price,
+  product name and vendor are captured in SaleItems. Saving increments the product
+  version and never permits sale quantity to exceed current on-hand stock.
+- StockCounts stores the recorder, confirmation time and optional notes. Each
+  StockCountItems row snapshots product name, SKU and vendor plus expected and
+  counted quantities. Physical quantity is 0–1,000,000; variance is counted minus
+  expected. A completed count has at least one distinct product, and nonzero
+  variances require a note (up to 1,000 characters). Recorder: 1–120 characters.
+- Each nonzero count variance has exactly one COUNT_ADJUSTMENT movement with
+  source_id equal to count_id and quantity_delta equal to that variance. Matching
+  counts create history without a zero adjustment. Count source/product references
+  must resolve. Product version increments even for a matching count so other
+  open counts must recheck. Open count baselines are local form data; saving
+  requires unchanged product version and expected stock, inside one transaction.
+- Current contract adds StockCounts and StockCountItems, making eight app-owned
+  worksheets. Room and Sheets schema stay at fresh-install version 1. There is
+  no schema migration or backward compatibility support.
+
+This contract covers product metadata, stock movements, completed-sale records
+and completed physical counts.
 Void/refund/discount/tax/consignor-settlement rules are not defined yet. Extend
 the schema explicitly when those workflows are designed.
 

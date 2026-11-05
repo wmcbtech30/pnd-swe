@@ -1,7 +1,7 @@
 # Prototype status
 
 Branch: `litmus_3`, continuing the local-first prototype from `litmus_2`.
-Historical decisions and checks remain in `logs/log-rev000.log` through 008.
+Historical decisions and checks remain in `logs/log-rev000.log` through 009.
 
 ## Implemented
 
@@ -16,7 +16,7 @@ Historical decisions and checks remain in `logs/log-rev000.log` through 008.
 - Google Play services OAuth authorization with limited `drive.file`, OpenID and
   email scopes. Onboarding cannot bypass real authorization/workbook connection.
 - Onboarding choice between an existing file through Google’s own Picker and
-  creating a named file. Six `(Paninda)` worksheets live inside that one file.
+  creating a named file. Eight `(Paninda)` worksheets live inside that one file.
   Real Sheets REST read/write remains behind a modular adapter. Core domain models and
   Room repository do not depend on Google transport.
 - Conditional Figma-style warning only when a selected file has cell data and
@@ -70,6 +70,18 @@ Historical decisions and checks remain in `logs/log-rev000.log` through 008.
   and valid imported movements, including archived products/vendors. Both reports
   react to Room changes and work offline; no report fixtures are packaged.
 
+- Sell and Home open a completed-sale recording form: product lines, quantities,
+  recorded unit prices, recorder and final confirmation. No cart/checkout,
+  tendered amount, payment collection or payment verification. New records use
+  NOT_RECORDED payment metadata, appear in History/Home, and deduct stock once.
+- Tools → Stock Counts: count history, physical-count entry, expected quantities,
+  per-product variances, required discrepancy explanation and confirmation.
+  Blank products are skipped; zero is explicit. Stale baselines block saving.
+  Count history includes matching/no-change counts and persists across restart.
+- Recording writes are atomic and idempotent by record ID. Stock movements,
+  item snapshots, product versions and pending changes save together. Sheets
+  maps count history through StockCounts and StockCountItems worksheets.
+
 ## Operational limits and pending work
 
 | Area | Status |
@@ -82,11 +94,11 @@ Historical decisions and checks remain in `logs/log-rev000.log` through 008.
 | Concurrency | Single writer only. Before/after checks detect many conflicts, but Sheets has no conditional-write CAS here. Do not edit Sheets or another device during sync. Reliable concurrent writes need a coordinator/protocol. |
 | Conflict resolution | Warnings and suggestions exist. No automatic merge, row comparison UI, force overwrite, or automatic local-only backup export. |
 | Failed creation | Timed-out work may have reached Google; incomplete or duplicate workbooks can remain. The app never automatically deletes them. |
-| Selling | POS transactions are excluded by the current scope. Catalog/search/filter only; no cart, checkout, payment, receipt creation or sale stock deduction. |
-| History | Displays persisted/imported receipts; no manual receipt creation. |
+| Selling | Completed-sale recording implemented with stock deduction. POS/payment processing, checkout, voids/refunds and backdated entry are excluded/not implemented. |
+| History | Displays recorded/imported sales and immutable item/price snapshots. |
 | Vendors | Management implemented. Vendor payments, settlement, purchase orders and receiving remain undefined/pending. |
-| Reports | Current inventory and recorded stock movements implemented. Historical stock balances, cost/profit, receiving summaries, physical-count variance and export remain pending. POS/sales reports excluded from current scope. |
-| Stock workflows | Physical counts, variance approval, receiving and adjustments pending. |
+| Reports | Current inventory and recorded stock movements implemented. Historical stock balances, cost/profit, receiving summaries, aggregate count-variance analysis and export remain pending. Count details show individual variances. No POS analytics. |
+| Stock workflows | Physical counts, user confirmation, variance history and count adjustments implemented. Receiving, standalone adjustments and role-based count approval remain pending. |
 | Product lifecycle | No delete/archive, barcode scan, images, variants or bulk import. |
 | Staff accounts | Google identity binds workbook access; staff roles/permissions are pending. |
 | Financial workflows | Voids, refunds, discounts, taxes and consignor settlement are undefined. |
@@ -98,7 +110,7 @@ Historical decisions and checks remain in `logs/log-rev000.log` through 008.
 stock ledger and receipt-total rules remain unchanged. The Google adapter requires
 original header order; pure import mapping remains tolerant of reordered headers.
 App state/outbox are device metadata. This branch uses a fresh Room/schema-1
-contract with expanded vendor columns. Per the requested testing workflow, no
+contract with expanded vendor columns and stock-count tables. Per the requested testing workflow, no
 schema upgrades, migrations or backward compatibility are provided. Uninstall
 and use a new file or freshly initialized app worksheets when testing this branch.
 
@@ -113,8 +125,8 @@ Google Cloud registration, official references and device acceptance steps.
 
 ## Verification
 
-Keep iteration lean: twenty-two focused checks covering existing data flows, worksheet inspection,
+Keep iteration lean: twenty-five focused checks covering existing data flows, worksheet inspection,
 sync presentation, launch-based greeting rotation, vendor lifecycle rules and
-inventory-report calculations. No maintained screenshot baselines, layout
+inventory-report calculations and atomic sale/count recording. No maintained screenshot baselines, layout
 assertions or device matrix.
-Build/lint/regression results for this revision are recorded in log-rev008.
+Build/lint/regression results for this revision are recorded in log-rev009.

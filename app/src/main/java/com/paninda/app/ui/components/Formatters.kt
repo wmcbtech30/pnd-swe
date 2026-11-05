@@ -16,4 +16,8 @@ fun dateTimeLabel(time: Long): String = Instant.ofEpochMilli(time).atZone(ShopZo
 
 @Composable
 fun paymentLabel(method: PaymentMethod): String = stringResource(
-    if (method == PaymentMethod.CASH) R.string.history_cash else R.string.history_manual)
+    when (method) {
+        PaymentMethod.CASH -> R.string.history_cash
+        PaymentMethod.MANUAL_OTHER -> R.string.history_manual
+        PaymentMethod.NOT_RECORDED -> R.string.sale_record_payment_none
+    })

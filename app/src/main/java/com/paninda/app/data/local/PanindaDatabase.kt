@@ -10,7 +10,7 @@ import com.paninda.app.data.local.entities.*
 @Database(
     entities = [VendorEntity::class, ProductEntity::class, TransactionEntity::class,
         TransactionItemEntity::class, StockMovementEntity::class,
-        PendingChangeEntity::class, AppStateEntity::class],
+        PendingChangeEntity::class, AppStateEntity::class, StockCountEntity::class, StockCountItemEntity::class],
     version = 1, exportSchema = true,
 )
 abstract class PanindaDatabase : RoomDatabase() {

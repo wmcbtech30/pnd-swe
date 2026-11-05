@@ -86,3 +86,21 @@ fun TransactionItem.toEntity() = TransactionItemEntity(id, transactionId, produc
 fun StockMovement.toEntity() = StockMovementEntity(id, productId, quantityDelta, movementType, sourceId, occurredAt, reason)
 
 fun Vendor.toEntity() = VendorEntity(id, name, contactPerson, phone, email, address, notes, isActive, updatedAt, version)
+
+@Entity(tableName = "stock_counts")
+data class StockCountEntity(@PrimaryKey val id: String, val countedAt: Long, val countedBy: String, val notes: String) {
+    fun toDomain() = StockCount(id, countedAt, countedBy, notes)
+}
+
+@Entity(tableName = "stock_count_items", indices = [Index("countId"), Index("productId")],
+    foreignKeys = [
+        ForeignKey(entity = StockCountEntity::class, parentColumns = ["id"], childColumns = ["countId"]),
+        ForeignKey(entity = ProductEntity::class, parentColumns = ["id"], childColumns = ["productId"]),
+    ])
+data class StockCountItemEntity(@PrimaryKey val id: String, val countId: String, val productId: String,
+    val productNameSnapshot: String, val skuSnapshot: String, val vendorIdSnapshot: String,
+    val expectedQuantity: Int, val countedQuantity: Int) {
+    fun toDomain() = StockCountItem(id, countId, productId, productNameSnapshot, skuSnapshot, vendorIdSnapshot, expectedQuantity, countedQuantity)
+}
+fun StockCount.toEntity() = StockCountEntity(id, countedAt, countedBy, notes)
+fun StockCountItem.toEntity() = StockCountItemEntity(id, countId, productId, productNameSnapshot, skuSnapshot, vendorIdSnapshot, expectedQuantity, countedQuantity)

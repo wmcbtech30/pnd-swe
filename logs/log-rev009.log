@@ -1,0 +1,81 @@
+Paninda revision 009 — completed-sale recording and stock counts
+Date: 2026-11-05 (UTC)
+Branch: litmus_3
+Base: d796873
+
+REQUEST / SCOPE
+Implement selling as recording only, without POS/payment transactions, plus
+Stock Counts under Management. Preserve local-first behavior, current palette,
+page-specific Kotlin/resources and fresh testing schemas without migrations.
+Automatic sync remains last priority. No production fixtures/sample records.
+
+IMPLEMENTED
+- Sell retains searchable/filterable products. Product add buttons and Record
+  Sale FAB open a recording form, not a cart or checkout. Home New Sale opens
+  the same form. Users record completed item quantities, unit prices and recorder.
+  Save confirmation explains stock deduction and no payment collection/verification.
+- Atomic sale writes: Sales record, immutable SaleItems snapshots, negative SALE
+  movements, product version/timestamp increments and queued pending changes.
+  Insufficient stock, inactive/missing products, duplicate lines, invalid inputs
+  and arithmetic overflow cannot leave a partial record. Stable operation IDs
+  make repeated saves idempotent. New sales use NOT_RECORDED payment with no
+  amount tendered. Existing imported cash metadata can still be displayed.
+- Saved sales open existing details and update Home, History, Inventory and
+  reports through Room observation. No payment entry, checkout, cash/change
+  calculation in recording, receipt printer or payment processor added.
+- Tools → Stock Counts now opens saved count history with search/date filters.
+  New count captures active-product expected quantities and versions on opening.
+  Physical fields start blank; blank skips a product, explicit zero means empty.
+  Fields show per-product variances; a reason is required for discrepancies.
+- Review/confirm commits immutable count header/item snapshots and one signed
+  COUNT_ADJUSTMENT for each nonzero variance. Matching counts retain history
+  without a zero movement. A count updates product versions even when matching,
+  invalidating other open count baselines. Stock/version changes since opening
+  reject the entire count; no silent rebase or overwrite. No staff approval roles.
+- Sale/count forms retain drafts on recreation, warn before discarding, keep
+  title/search fixed and isolate scroll content with IME/FAB clearance. Bottom
+  navigation is hidden during entry. Details are separate Kotlin pages with
+  per-page strings. Material icons and existing card colors reused.
+- New domain models/drafts/results and a separate local RecordingRepository.
+  Room stock_counts and stock_count_items tables preserve completed counts.
+  Snapshot/import/reset/outbox include counts. Product details and movement report
+  now correctly label sale and count adjustment types.
+- Sheets contract adds StockCounts (Paninda) and StockCountItems (Paninda), for
+  eight app-owned worksheets, A1 headers. Mapper validates references, distinct
+  count products, physical quantities and exact count adjustment/variance pairs.
+  Product/domain code remains independent of Google transport.
+- Room/schema metadata remain version 1 with a revised fresh exported schema.
+  No migrations, upgrades or legacy compatibility. Test by uninstalling and
+  creating a new file/fresh app worksheets. Setup text/docs now say eight pages.
+
+VERIFICATION
+Focused results appended after checks complete. Three recording repository
+checks cover atomic/idempotent sales, overselling/missing products, count zeros,
+matching counts, variance notes, stale baselines, reset/import and Sheets count
+validation. Existing UI smoke is extended through sale and count creation,
+stock deduction, details, activity recreation and reset. Temporary render inputs
+are test-only and ignored under work/recording; no maintained layout tests.
+
+LIMITS
+Completed sales are recorded at save time; backdating, editing/voiding/refunding
+saved sales, payment handling and POS checkout are not included. Stock receiving,
+standalone adjustments, saved unfinished drafts across process/task removal,
+role-based count approval and automatic sync are not implemented. No live-device
+or live-Google acceptance claim. No push or Drive upload requested in this turn.
+
+FINAL CHECKS
+- All 25 maintained focused checks passed, zero failures/errors. Three new
+  recording checks cover atomic/idempotent sales, no payment metadata, shortage
+  rejection, count zeros/matching counts, stale baselines and Sheets/reset/import.
+- Expanded existing UI smoke passed: offline product/vendor/report flows,
+  completed sale saved without payment, stock 12→10, physical count 10→9,
+  variance -1, detail persistence after activity recreation and full local reset.
+- The first recording-test run exposed a test setup return-type error; corrected
+  the JUnit setup method to return Unit, then reran the maintained suite cleanly.
+- Ignored temporary sale/count/count-detail/compact renders passed and were
+  inspected. No maintained layout tests, screenshot baselines or demo records.
+- assembleDebug and lintDebug passed; lint reports zero errors. Rebuilt after
+  ensuring Stock Counts keeps the Tools navigation pillar selected.
+- APK: app/build/outputs/apk/debug/app-debug.apk.
+- Fresh Room version 1/eight-worksheet contract documented; no migrations added.
+- No remote Git push or Drive upload requested; changes committed locally.

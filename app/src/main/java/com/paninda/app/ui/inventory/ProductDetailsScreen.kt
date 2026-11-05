@@ -55,7 +55,12 @@ fun ProductDetailsScreen(productId: String, products: List<Product>, vm: ShopVie
             }
             items(movements, key = { it.id }) { movement ->
                 DetailField(stringResource(R.string.product_details_movement,
-                    stringResource(R.string.product_details_opening),
+                    when (movement.movementType) {
+                        "OPENING" -> stringResource(R.string.product_details_opening)
+                        "SALE" -> stringResource(R.string.movement_reports_sale)
+                        "COUNT_ADJUSTMENT" -> stringResource(R.string.movement_reports_count)
+                        else -> movement.movementType
+                    },
                     pluralStringResource(R.plurals.product_details_units, movement.quantityDelta, movement.quantityDelta)),
                     dateTimeLabel(movement.occurredAt))
             }

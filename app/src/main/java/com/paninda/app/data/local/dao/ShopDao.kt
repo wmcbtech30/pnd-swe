@@ -14,6 +14,16 @@ private const val PRODUCT_QUERY = """
 
 @Dao
 interface ShopDao {
+    @Query("SELECT * FROM stock_counts ORDER BY countedAt DESC, id") fun observeCounts(): Flow<List<StockCountEntity>>
+    @Query("SELECT * FROM stock_counts ORDER BY countedAt DESC") suspend fun counts(): List<StockCountEntity>
+    @Query("SELECT * FROM stock_counts WHERE id = :id") suspend fun count(id: String): StockCountEntity?
+    @Query("SELECT * FROM stock_count_items ORDER BY rowid") suspend fun allCountItems(): List<StockCountItemEntity>
+    @Query("SELECT * FROM stock_count_items WHERE countId = :id ORDER BY rowid") suspend fun countItems(id: String): List<StockCountItemEntity>
+    @Query("SELECT * FROM transactions WHERE id = :id") suspend fun transaction(id: String): TransactionEntity?
+    @Insert suspend fun putCount(record: StockCountEntity)
+    @Insert suspend fun putCountItems(records: List<StockCountItemEntity>)
+    @Query("DELETE FROM stock_count_items") suspend fun clearCountItems()
+    @Query("DELETE FROM stock_counts") suspend fun clearCounts()
     @Query(PRODUCT_QUERY) fun observeProducts(): Flow<List<ProductRow>>
     @Query(PRODUCT_QUERY) suspend fun products(): List<ProductRow>
     @Query("SELECT * FROM transactions ORDER BY soldAt DESC, receiptNumber DESC")

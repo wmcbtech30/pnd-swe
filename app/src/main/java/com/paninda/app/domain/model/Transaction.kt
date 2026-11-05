@@ -1,6 +1,6 @@
 package com.paninda.app.domain.model
 
-enum class PaymentMethod { CASH, MANUAL_OTHER }
+enum class PaymentMethod { CASH, MANUAL_OTHER, NOT_RECORDED }
 enum class SyncState { PENDING, ACKNOWLEDGED }
 
 data class Transaction(

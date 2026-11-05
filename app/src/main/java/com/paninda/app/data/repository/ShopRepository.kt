@@ -24,8 +24,8 @@ class ShopRepository(private val db: PanindaDatabase, private val clock: Clock =
             syncStatus = if (pending > 0 && values["sync_status"] == "synced") "pending" else values["sync_status"] ?: "idle")
     }
 
-    val state = combine(baseState, dao.observeMovements()) { state, movements ->
-        state.copy(movements = movements.map { it.toDomain() })
+    val state = combine(baseState, dao.observeMovements(), dao.observeCounts()) { state, movements, counts ->
+        state.copy(movements = movements.map { it.toDomain() }, counts = counts.map { it.toDomain() })
     }
 
     suspend fun initialize() = db.withTransaction {
@@ -63,6 +63,8 @@ class ShopRepository(private val db: PanindaDatabase, private val clock: Clock =
             dao.putTransactions(remote.transactions.map { it.toEntity() })
             dao.putItems(remote.items.map { it.toEntity() })
             dao.putMovements(remote.movements.map { it.toEntity() })
+            remote.counts.forEach { dao.putCount(it.toEntity()) }
+            dao.putCountItems(remote.countItems.map { it.toEntity() })
         }
         if (unchanged) {
             dao.clearPending()
@@ -85,6 +87,8 @@ class ShopRepository(private val db: PanindaDatabase, private val clock: Clock =
     }
 
     private suspend fun clearBusinessData() {
+        dao.clearCountItems()
+        dao.clearCounts()
         dao.clearItems()
         dao.clearTransactions()
         dao.clearMovements()
@@ -93,12 +97,16 @@ class ShopRepository(private val db: PanindaDatabase, private val clock: Clock =
         dao.clearPending()
     }
 
+    suspend fun recordSale(draft: SaleDraft) = RecordingRepository(db, clock).recordSale(draft)
+    suspend fun recordCount(draft: CountDraft) = RecordingRepository(db, clock).recordCount(draft)
+    suspend fun countItems(id: String) = dao.countItems(id).map { it.toDomain() }
+
     suspend fun items(transactionId: String) = dao.items(transactionId).map { it.toDomain() }
     suspend fun movements(productId: String) = dao.productMovements(productId).map { it.toDomain() }
     suspend fun snapshot() = db.withTransaction {
         ShopSnapshot(dao.vendors().map { it.toDomain() }, dao.products().map { it.toDomain() },
             dao.transactions().map { it.toDomain() }, dao.allItems().map { it.toDomain() },
-            dao.movements().map { it.toDomain() })
+            dao.movements().map { it.toDomain() }, dao.counts().map { it.toDomain() }, dao.allCountItems().map { it.toDomain() })
     }
 
     suspend fun saveProduct(id: String?, draft: ProductDraft): SaveProductResult {

@@ -15,6 +15,8 @@ object WorkbookSchema {
             "total_minor", "amount_tendered_minor", "item_count"),
         "SaleItems" to listOf("sale_item_id", "sale_id", "product_id", "product_name_snapshot",
             "vendor_id_snapshot", "quantity", "unit_price_minor"),
+        "StockCounts" to listOf("count_id", "counted_at", "counted_by", "notes"),
+        "StockCountItems" to listOf("count_item_id", "count_id", "product_id", "product_name_snapshot", "sku_snapshot", "vendor_id_snapshot", "expected_quantity", "counted_quantity"),
         "StockMovements" to listOf("movement_id", "product_id", "quantity_delta",
             "movement_type", "source_id", "occurred_at", "reason"),
     )

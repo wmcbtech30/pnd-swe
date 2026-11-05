@@ -23,6 +23,9 @@ object SheetsMapper {
                 it.amountTenderedMinor?.toString().orEmpty(), it.itemCount.toString()) }),
             table("SaleItems", snapshot.items.map { listOf(it.id, it.transactionId, it.productId,
                 it.productNameSnapshot, it.vendorIdSnapshot, it.quantity.toString(), it.unitPriceMinor.toString()) }),
+            table("StockCounts", snapshot.counts.map { listOf(it.id, instant(it.countedAt), it.countedBy, it.notes) }),
+            table("StockCountItems", snapshot.countItems.map { listOf(it.id, it.countId, it.productId, it.productNameSnapshot,
+                it.skuSnapshot, it.vendorIdSnapshot, it.expectedQuantity.toString(), it.countedQuantity.toString()) }),
             table("StockMovements", snapshot.movements.map { listOf(it.id, it.productId, it.quantityDelta.toString(),
                 it.movementType, it.sourceId, instant(it.occurredAt), it.reason) }),
         )
@@ -125,7 +128,38 @@ object SheetsMapper {
             ensure(total == transaction.totalMinor && lines.sumOf { it.quantity.toLong() } == transaction.itemCount.toLong(),
                 "Receipt total or item count does not match its lines")
         }
-        return ShopSnapshot(vendors, products, transactions, items, movements)
+        val counts = records("StockCounts").map {
+            val recorder = it.text("counted_by")
+            val notes = it["notes"].orEmpty().trim()
+            ensure(recorder.length <= 120 && notes.length <= 1000, "Invalid count recorder or notes")
+            StockCount(it.text("count_id"), it.time("counted_at"), recorder, notes)
+        }
+        unique(counts.map { it.id }, "count IDs")
+        val countIds = counts.map { it.id }.toSet()
+        val countItems = records("StockCountItems").map {
+            val counted = it.integer("counted_quantity")
+            ensure(counted in 0..1_000_000, "Invalid physical quantity")
+            StockCountItem(it.text("count_item_id"), it.text("count_id"), it.text("product_id"),
+                it.text("product_name_snapshot"), it.text("sku_snapshot"), it.text("vendor_id_snapshot"),
+                it.integer("expected_quantity"), counted)
+        }
+        unique(countItems.map { it.id }, "count item IDs")
+        ensure(countItems.all { it.countId in countIds && it.productId in productIds && it.vendorIdSnapshot in vendorNames }, "Unknown count reference")
+        counts.forEach { count ->
+            val lines = countItems.filter { it.countId == count.id }
+            ensure(lines.isNotEmpty(), "Empty stock count")
+            unique(lines.map { it.productId }, "count product IDs")
+            ensure(lines.none { it.variance != 0L } || count.notes.isNotBlank(), "Missing variance explanation")
+            lines.forEach { line ->
+                val adjustments = movements.filter { it.movementType == "COUNT_ADJUSTMENT" && it.sourceId == count.id && it.productId == line.productId }
+                ensure(if (line.variance == 0L) adjustments.isEmpty() else adjustments.size == 1 && adjustments.single().quantityDelta.toLong() == line.variance,
+                    "Count adjustment does not match variance")
+            }
+        }
+        ensure(movements.filter { it.movementType == "COUNT_ADJUSTMENT" }.all { movement ->
+            countItems.any { it.countId == movement.sourceId && it.productId == movement.productId }
+        }, "Unknown count adjustment reference")
+        return ShopSnapshot(vendors, products, transactions, items, movements, counts, countItems)
     }
 
     private fun Map<String, String>.text(key: String): String =

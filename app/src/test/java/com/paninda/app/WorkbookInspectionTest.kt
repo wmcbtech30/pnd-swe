@@ -14,7 +14,7 @@ class WorkbookInspectionTest {
     @Test fun warningRequiresBothExistingDataAndMissingAppWorksheets() {
         val empty = WorkbookInspection(listOf(SpreadsheetPage(10, "Sheet1", emptyList())))
         assertFalse(empty.requiresWarning)
-        assertEquals(6, empty.missingPages.size)
+        assertEquals(WorkbookSchema.headers.size, empty.missingPages.size)
         val unrelated = SpreadsheetPage(10, "My existing records", listOf(listOf("name", "price"), listOf("Keep me", "9.50")))
         assertTrue(WorkbookInspection(listOf(unrelated)).requiresWarning)
         assertFalse(WorkbookInspection(appPages() + unrelated).requiresWarning)

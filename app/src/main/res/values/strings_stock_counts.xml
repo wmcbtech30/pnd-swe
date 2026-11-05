@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="counts_title">Stock counts</string>
+    <string name="counts_search">Search recorder or count ID</string>
+    <string name="counts_empty">No completed stock counts yet.</string>
+    <string name="counts_new">New count</string>
+</resources>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="sale_record_title">Record sale</string>
+    <string name="sale_record_note">Record items already sold. Saving reduces stock and adds a sale record to History. Sale time is set when saved. Payments are not handled here.</string>
+    <string name="sale_record_by">Recorded by</string>
+    <string name="sale_record_add">Add product</string>
+    <string name="sale_record_quantity">Quantity sold</string>
+    <string name="sale_record_price">Recorded unit price (Php)</string>
+    <string name="sale_record_available">Current stock: %1$d units</string>
+    <string name="sale_record_product">%1$s · %2$s · %3$d available</string>
+    <string name="sale_record_remove">Remove %1$s</string>
+    <string name="sale_record_total">Recorded value</string>
+    <string name="sale_record_review">Review sale</string>
+    <string name="sale_record_confirm_title">Save this completed sale?</string>
+    <string name="sale_record_confirm_body">Recorded value: Php%1$s. Confirm that these items were sold. Saving deducts their quantities from stock. No payment is collected or verified.</string>
+    <string name="sale_record_save">Save sale record</string>
+    <string name="sale_record_payment_none">Not recorded</string>
+</resources>

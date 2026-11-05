@@ -86,6 +86,7 @@ private fun movementTypeLabel(type: String): String = when (type) {
     "RECEIVING" -> stringResource(R.string.movement_reports_receiving)
     "ADJUSTMENT" -> stringResource(R.string.movement_reports_adjustment)
     "SALE" -> stringResource(R.string.movement_reports_sale)
+    "COUNT_ADJUSTMENT" -> stringResource(R.string.movement_reports_count)
     else -> type
 }
 

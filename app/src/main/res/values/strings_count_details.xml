@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="count_details_title">Count details</string>
+    <string name="count_details_missing">This count is no longer available.</string>
+    <string name="count_details_date">Confirmed at</string>
+    <string name="count_details_notes">Reason / notes</string>
+    <string name="count_details_quantities">Expected: %1$d · Counted: %2$d</string>
+    <string name="count_details_immutable">This completed count is kept as history. Start a new count to make another correction.</string>
+</resources>

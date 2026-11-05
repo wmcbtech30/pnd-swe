@@ -6,6 +6,8 @@ data class ShopSnapshot(
     val transactions: List<Transaction> = emptyList(),
     val items: List<TransactionItem> = emptyList(),
     val movements: List<StockMovement> = emptyList(),
+    val counts: List<StockCount> = emptyList(),
+    val countItems: List<StockCountItem> = emptyList(),
 )
 
 data class ShopState(
@@ -22,4 +24,5 @@ data class ShopState(
     val networkStatus: NetworkStatus = NetworkStatus.UNKNOWN,
     val vendors: List<Vendor> = emptyList(),
     val movements: List<StockMovement> = emptyList(),
+    val counts: List<StockCount> = emptyList(),
 )

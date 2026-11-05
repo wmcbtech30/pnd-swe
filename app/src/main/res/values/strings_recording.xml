@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="recording_invalid">Enter a recorder, at least one item, and valid quantities/prices. Add a reason for count variances.</string>
+    <string name="recording_unavailable">A product is no longer active or available. Close this form and start again.</string>
+    <string name="recording_stock">There is not enough stock to record this sale. Check quantities and current inventory.</string>
+    <string name="recording_stale">Stock or product details changed after this count began. Your count was not applied. Close this form, start a new count and recheck physical quantities.</string>
+</resources>

@@ -55,7 +55,8 @@ Use a physical Android device with up-to-date Google Play services, a browser an
    Picker; cancellation, denied permissions or network failure never open Home.
 2. New file: enter a name, confirm creation and authorize Google. Inspect Drive:
    the file contains `Meta (Paninda)`, `Vendors (Paninda)`, `Products (Paninda)`,
-   `Sales (Paninda)`, `SaleItems (Paninda)` and `StockMovements (Paninda)`.
+   `Sales (Paninda)`, `SaleItems (Paninda)`, `StockMovements (Paninda)`,
+   `StockCounts (Paninda)` and `StockCountItems (Paninda)`.
    Headers start at A1. No sample records. Retained device records are uploaded.
 3. After connection, turn off Wi-Fi/mobile data. The current page and local
    records must remain available. Sync Status shows an offline X. Tap Sync Now:
@@ -98,6 +99,18 @@ Use a physical Android device with up-to-date Google Play services, a browser an
     confirm reports still work. Sync valid remote movements and verify reports
     refresh without reopening. Current stock cards are not historical balances.
 
+12. Sell → Record sale: select one or more products, enter quantities and actual
+    unit prices, review and save. Check History and on-hand stock; payment must
+    display Not recorded. Insufficient stock must block the save. Restart offline
+    and confirm persistence. Sync should upload Sales/SaleItems/SALE movements
+    without collecting or verifying a payment.
+13. Tools → Stock Counts: count selected products, leaving others blank. Enter 0
+    explicitly when empty. Add a reason for variances, review and confirm. Check
+    expected/counted quantities and history, including a count with no variance.
+    A sale or product edit during an open count must block that stale count.
+    Sync and inspect the two count worksheets and matching COUNT_ADJUSTMENT
+    movements; a clean installation should import the same history and quantities.
+
 ## Sync and recovery limits
 
 Room is the working database and remains available offline after connection.
@@ -119,7 +132,7 @@ local-only changes, acknowledges identical snapshots, and stops on divergence.
 Imports and acknowledgements use a Room transaction with a local-hash guard:
 edits made during network work cannot be silently discarded/acknowledged.
 
-Writes use one Sheets batch for the six suffixed app worksheets, stringValue cells
+Writes use one Sheets batch for the eight suffixed app worksheets, stringValue cells
 (no formula execution), and no changes to unrelated worksheets. Original exact
 header order is required by the live adapter to avoid reassigning fields while
 writing; the pure mapper remains tolerant of reordered input for future import.

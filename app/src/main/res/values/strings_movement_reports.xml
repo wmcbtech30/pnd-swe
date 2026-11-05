@@ -13,7 +13,7 @@
     </plurals>
     <string name="movement_reports_added">Units added</string>
     <string name="movement_reports_removed">Units removed</string>
-    <string name="movement_reports_note">Activity includes opening stock and imported movements. Date filters apply to activity, not current stock. Counts and receiving entry are not available yet.</string>
+    <string name="movement_reports_note">Activity includes opening stock and imported movements. Date filters apply to activity, not current stock. Physical counts are under Tools. Receiving entry is not available yet.</string>
     <string name="movement_reports_vendor_note">Uses each product’s current vendor, including archived vendors and products.</string>
     <string name="movement_reports_empty">No recorded movements match these filters.</string>
     <string name="movement_reports_product">%1$s · %2$s</string>
@@ -21,5 +21,6 @@
     <string name="movement_reports_opening">Opening stock</string>
     <string name="movement_reports_receiving">Receiving</string>
     <string name="movement_reports_adjustment">Adjustment</string>
-    <string name="movement_reports_sale">Imported sale</string>
+    <string name="movement_reports_sale">Recorded sale</string>
+    <string name="movement_reports_count">Count adjustment</string>
 </resources>

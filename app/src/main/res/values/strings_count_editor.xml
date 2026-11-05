@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="count_editor_title">New stock count</string>
+    <string name="count_editor_search">Search name or SKU</string>
+    <string name="count_editor_note">Enter physical quantities for the products you counted. Blank fields are skipped; enter 0 for none. Expected stock is captured when this count opens.</string>
+    <string name="count_editor_by">Counted by</string>
+    <string name="count_editor_notes">Reason / notes (required for variances)</string>
+    <string name="count_editor_expected">Expected: %1$d units</string>
+    <string name="count_editor_physical">Physical quantity</string>
+    <string name="count_editor_variance">Variance: %1$s units</string>
+    <string name="count_editor_empty">Add active products before starting a count.</string>
+    <string name="count_editor_invalid">Enter a recorder and at least one physical quantity from 0 to 1,000,000. Explain any variance in the notes.</string>
+    <string name="count_editor_review">Review count</string>
+    <string name="count_editor_confirm_title">Confirm this stock count?</string>
+    <string name="count_editor_confirm_body">Counted products: %1$d. Products with a variance: %2$d. Confirming updates stock to the entered physical quantities and keeps a permanent count record. Blank fields remain unchanged.</string>
+    <string name="count_editor_confirm">Confirm count</string>
+</resources>

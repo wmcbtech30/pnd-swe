@@ -28,7 +28,7 @@ val Pillars = listOf(
 fun pillarFor(route: String): String = when {
     route.startsWith("product") -> "inventory"
     route.startsWith("transaction") -> "history"
-    route == "sync" || route == "settings" -> "tools"
+    route.startsWith("counts") || route == "sync" || route == "settings" -> "tools"
     else -> route.substringBefore("?")
 }
 

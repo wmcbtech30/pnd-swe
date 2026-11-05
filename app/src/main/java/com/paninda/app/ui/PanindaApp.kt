@@ -18,6 +18,8 @@ import com.paninda.app.R
 import com.paninda.app.domain.model.*
 import com.paninda.app.ui.home.HomeScreen
 import com.paninda.app.ui.sell.SellScreen
+import com.paninda.app.ui.sell.RecordSaleScreen
+import com.paninda.app.ui.counts.*
 import com.paninda.app.ui.vendors.*
 import com.paninda.app.ui.reports.*
 import com.paninda.app.ui.inventory.*
@@ -61,7 +63,7 @@ private fun ConnectedApp(vm: ShopViewModel, state: ShopState, resolveGoogle: Res
     val nav = rememberNavController()
     val entry by nav.currentBackStackEntryAsState()
     val route = entry?.destination?.route.orEmpty().ifEmpty { "home" }
-    val editor = route.startsWith("product/new") || route == "vendor/new" || route.endsWith("/edit")
+    val editor = route.startsWith("product/new") || route == "vendor/new" || route.startsWith("sale/new") || route == "counts/new" || route.endsWith("/edit")
     val snackbar = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -83,7 +85,6 @@ private fun ConnectedApp(vm: ShopViewModel, state: ShopState, resolveGoogle: Res
             }
         }
     }
-    fun message(id: Int) { scope.launch(Dispatchers.Main.immediate) { snackbar.showSnackbar(context.getString(id)) } }
     fun action(block: suspend () -> Unit) {
         scope.launch(Dispatchers.Main.immediate) {
             try { block() }
@@ -119,18 +120,33 @@ private fun ConnectedApp(vm: ShopViewModel, state: ShopState, resolveGoogle: Res
     ) { padding ->
         NavHost(nav, startDestination = "home", modifier = Modifier.fillMaxSize().padding(padding)) {
             composable("home") {
-                HomeScreen(state, onSell = { root("sell") }, onHistory = { nav.navigate("history") },
+                HomeScreen(state, onSell = { nav.navigate("sale/new") }, onHistory = { nav.navigate("history") },
                     onReceipt = { nav.navigate("transaction/" + Uri.encode(it)) },
                     onStock = { nav.navigate("inventory?stock=" + it.name) }, onSync = { nav.navigate("sync") })
             }
-            composable("sell") { SellScreen(state.products) { message(R.string.sell_pending) } }
+            composable("sell") { SellScreen(state.products) { id -> nav.navigate("sale/new?product=" + Uri.encode(id.orEmpty())) } }
+            composable("sale/new?product={product}", arguments = listOf(navArgument("product") { defaultValue = "" })) { entry ->
+                RecordSaleScreen(state, vm, entry.arguments?.getString("product"), { nav.popBackStack() }) { id ->
+                    nav.popBackStack()
+                    nav.navigate("transaction/" + Uri.encode(id))
+                }
+            }
+            composable("counts") { StockCountsScreen(state.counts, { nav.popBackStack() }, { nav.navigate("counts/new") },
+                { nav.navigate("counts/" + Uri.encode(it)) }) }
+            composable("counts/new") { NewStockCountScreen(state, vm, { nav.popBackStack() }) { id ->
+                nav.popBackStack()
+                nav.navigate("counts/" + Uri.encode(id))
+            } }
+            composable("counts/{id}", arguments = listOf(navArgument("id") { type = NavType.StringType })) { entry ->
+                StockCountDetailsScreen(requireNotNull(entry.arguments?.getString("id")), state.counts, vm, { nav.popBackStack() })
+            }
             composable("inventory?stock={stock}", arguments = listOf(navArgument("stock") { defaultValue = "ALL" })) { backStack ->
                 val filter = runCatching { StockFilter.valueOf(backStack.arguments?.getString("stock") ?: "ALL") }.getOrDefault(StockFilter.ALL)
                 InventoryScreen(state.products, filter, onNew = { nav.navigate("product/new") },
                     onProduct = { nav.navigate("product/" + Uri.encode(it)) })
             }
             composable("history") { HistoryScreen(state.transactions) { nav.navigate("transaction/" + Uri.encode(it)) } }
-            composable("tools") { ToolsScreen({ nav.navigate("reports") }, { nav.navigate("vendors") }, { nav.navigate("sync") }, { nav.navigate("settings") }, ::message) }
+            composable("tools") { ToolsScreen({ nav.navigate("counts") }, { nav.navigate("reports") }, { nav.navigate("vendors") }, { nav.navigate("sync") }, { nav.navigate("settings") }) }
             composable("reports") {
                 InventoryReportsScreen(state, { nav.popBackStack() }, { nav.navigate("reports/movements") },
                     { nav.navigate("product/" + Uri.encode(it)) })

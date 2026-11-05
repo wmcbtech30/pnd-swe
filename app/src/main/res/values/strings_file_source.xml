@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="file_source_title">Your file</string>
-    <string name="file_source_body">Choose one Google Sheets file for this device, or create a new one. Paninda keeps its data in six dedicated worksheets inside that file.</string>
+    <string name="file_source_body">Choose one Google Sheets file for this device, or create a new one. Paninda keeps its data in eight dedicated worksheets inside that file.</string>
     <string name="file_source_existing">Choose an existing file</string>
     <string name="file_source_new">Create a new file</string>
 </resources>
