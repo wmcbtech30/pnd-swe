@@ -4,7 +4,9 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.paninda.app.ui.PanindaApp
+import com.paninda.app.ui.ShopViewModel
 import com.paninda.app.ui.theme.PanindaTheme
 
 class MainActivity : ComponentActivity() {
@@ -13,7 +15,9 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             PanindaTheme(darkTheme = false) {
-                PanindaApp()
+                val vm: ShopViewModel = viewModel(factory = ShopViewModel.Factory(
+                    (application as PanindaApplication).repository))
+                PanindaApp(vm)
             }
         }
     }

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="inventory_search">Search product name or SKU</string>
+    <string name="inventory_new">New Product</string>
+    <string name="inventory_stock">%1$d in stock</string>
+    <string name="inventory_low">%1$d · Low Stock</string>
+    <string name="inventory_out">Out of stock</string>
+    <string name="inventory_empty">No products yet. Add your first product.</string>
+</resources>

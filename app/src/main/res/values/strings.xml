@@ -1,9 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Paninda</string>
-    <string name="onboarding_brand">Repana\nStore</string>
-    <string name="onboarding_tagline">Manage your inventories</string>
-    <string name="onboarding_choose_source">Choose a data source to get started</string>
-    <string name="onboarding_google_sheets">Connect to Google Sheets</string>
-    <string name="onboarding_custom_database">Custom Database (Coming Soon)</string>
 </resources>

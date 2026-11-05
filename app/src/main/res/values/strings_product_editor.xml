@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="product_editor_new">New Product</string>
+    <string name="product_editor_edit">Edit Product</string>
+    <string name="product_editor_name">Product name</string>
+    <string name="product_editor_sku">SKU</string>
+    <string name="product_editor_vendor">Vendor name</string>
+    <string name="product_editor_category">Category</string>
+    <string name="product_editor_price">Selling price (Php)</string>
+    <string name="product_editor_quantity">Opening quantity</string>
+    <string name="product_editor_threshold">Low-stock threshold</string>
+    <string name="product_editor_save">Save product</string>
+    <string name="product_editor_invalid">Complete all fields. Use a valid SKU, a price with up to two decimal places, and whole-number stock values from 0 to 1,000,000.</string>
+    <string name="product_editor_duplicate">That SKU already belongs to another product.</string>
+    <string name="product_editor_missing">This product is no longer available.</string>
+    <string name="product_editor_stock_note">Stock quantities come from movements. Receiving and adjustments are pending.</string>
+    <string name="product_editor_unsaved_title">Discard unsaved changes?</string>
+    <string name="product_editor_unsaved_body">Your changes have not been saved.</string>
+    <string name="product_editor_discard">Discard</string>
+    <string name="product_editor_keep">Keep editing</string>
+</resources>

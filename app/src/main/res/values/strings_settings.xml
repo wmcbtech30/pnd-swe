@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_title">Settings</string>
+    <string name="settings_manage">MANAGE YOUR DATA</string>
+    <string name="settings_disconnect">Disconnect Workbook</string>
+    <string name="settings_reset">Reset local data</string>
+    <string name="settings_disconnect_title">Disconnect the local session?</string>
+    <string name="settings_disconnect_body">Return to onboarding? Your local records and pending changes will be kept.</string>
+    <string name="settings_reset_title">Reset local data?</string>
+    <string name="settings_reset_body">Delete all local products, receipts, stock movements, and pending changes? This cannot be undone.</string>
+    <string name="settings_reset_confirm">Delete local data</string>
+    <string name="settings_disconnect_confirm">Disconnect</string>
+    <string name="settings_reset_done">Local data cleared.</string>
+</resources>

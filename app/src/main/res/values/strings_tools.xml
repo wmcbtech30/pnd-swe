@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tools_management">MANAGEMENT</string>
+    <string name="tools_vendors">Vendors</string>
+    <string name="tools_stock_counts">Stock Counts</string>
+    <string name="tools_insights">INSIGHTS</string>
+    <string name="tools_reports">Reports</string>
+    <string name="tools_application">APPLICATION</string>
+    <string name="tools_sync">Sync Status</string>
+    <string name="tools_settings">Settings</string>
+    <string name="tools_vendors_pending">Vendor management is not implemented yet.</string>
+    <string name="tools_counts_pending">Stock counting is not implemented yet.</string>
+    <string name="tools_reports_pending">Reports are not implemented yet.</string>
+</resources>

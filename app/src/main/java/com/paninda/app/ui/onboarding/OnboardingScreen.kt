@@ -53,7 +53,7 @@ private val HeroGradient = Brush.verticalGradient(
 )
 
 @Composable
-fun OnboardingScreen(modifier: Modifier = Modifier) {
+fun OnboardingScreen(modifier: Modifier = Modifier, onContinue: () -> Unit = {}) {
     BoxWithConstraints(modifier.fillMaxSize().background(Color.White)) {
         val scale = (maxWidth / 412.dp).coerceIn(0.75f, 1f)
         val fontScale = LocalDensity.current.fontScale
@@ -123,7 +123,7 @@ fun OnboardingScreen(modifier: Modifier = Modifier) {
                 )
                 Spacer(Modifier.height(19.dp))
                 Button(
-                    onClick = {}, // UI prototype: no authentication or workbook access yet.
+                    onClick = onContinue,
                     modifier = Modifier.width(buttonWidth).heightIn(min = 54.dp),
                     shape = CircleShape,
                     colors = ButtonDefaults.buttonColors(

@@ -1,0 +1,44 @@
+package com.paninda.app.ui.sync
+
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.WarningAmber
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.paninda.app.R
+import com.paninda.app.domain.model.ShopState
+import com.paninda.app.ui.components.*
+import com.paninda.app.ui.theme.*
+
+@Composable
+fun SyncStatusScreen(state: ShopState, onBack: () -> Unit, onCheck: () -> Unit) {
+    PageScaffold(stringResource(R.string.sync_title), onBack = onBack) { padding ->
+        Column(Modifier.fillMaxSize().padding(padding).verticalScroll(rememberScrollState())
+            .padding(start = 30.dp, end = 20.dp, top = 16.dp, bottom = 24.dp)) {
+            Icon(Icons.Outlined.WarningAmber, null, Modifier.size(128.dp), tint = Palette.Icon)
+            Spacer(Modifier.height(12.dp))
+            Text(stringResource(R.string.sync_offline), fontFamily = AppFonts.Serif,
+                fontStyle = FontStyle.Italic, fontSize = 40.sp, lineHeight = 60.sp)
+            Spacer(Modifier.height(8.dp))
+            Text(stringResource(R.string.sync_explanation), fontFamily = AppFonts.Condensed, fontSize = 20.sp)
+            Text(if (state.lastCheckedAt == null) stringResource(R.string.sync_never)
+                else stringResource(R.string.sync_checked, timeLabel(state.lastCheckedAt)),
+                fontFamily = AppFonts.Condensed, fontSize = 20.sp)
+            Text(pluralStringResource(R.plurals.sync_pending_count, state.pendingCount, state.pendingCount),
+                fontFamily = AppFonts.Condensed, fontSize = 20.sp, modifier = Modifier.padding(top = 8.dp))
+            Spacer(Modifier.height(28.dp))
+            SectionLabel(stringResource(R.string.sync_tools))
+            Spacer(Modifier.height(8.dp))
+            MenuRow(stringResource(R.string.sync_now), onCheck)
+        }
+    }
+}

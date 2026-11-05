@@ -1,0 +1,35 @@
+PANINDA - IMPLEMENTATION REVISION 001
+Branch: litmus_1
+Base: 6538606 (onboard_demo)
+
+The user authorized implementation of the preflight review on a new branch
+named litmus_1. During implementation the user clarified:
+  "oh no sample demo, must be clean"
+
+This supersedes all sample-data and preset-identity proposals in revision 000.
+Production initialization must create no business records. Fixtures belong
+only in tests. No account identity, fake receipt, stock value, or successful
+sync event may be presented as real application data.
+
+Implementation scope and pending workflows are tracked in:
+  docs/PROTOTYPE_STATUS.md
+
+Reset semantics: clear local business records and pending changes, retain the
+local session, and do not seed or restore records. Disconnect preserves data
+and returns to onboarding. Google remains a local dashboard-entry bypass,
+with no OAuth or external connection.
+
+The original preflight log remains unchanged as a historical review.
+
+Additional user direction: reduce excessive tests to speed iteration and remove
+unnecessary layout tests. The implementation keeps focused data checks and one
+UI behavior smoke check. No layout/screenshot regression suite is retained.
+
+Completed scope: eight designed screens, local product add/edit/detail pages,
+read-only receipt details, contextual filters, Room persistence, shared models,
+workbook schema/mappers, unavailable transport adapters, and status documents.
+
+Verification: ten focused regression checks passed; debug APK build passed;
+Android lint has zero errors and dependency-update notices. Actual-device
+acceptance testing remains pending. No remote branch push is included in this
+implementation step.

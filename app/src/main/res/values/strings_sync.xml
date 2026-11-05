@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="sync_title">Sync Status</string>
+    <string name="sync_offline">You’re offline!</string>
+    <string name="sync_explanation">You are working offline. Changes stay on this device. Cloud sync is not connected in this prototype.</string>
+    <string name="sync_never">No cloud sync has been performed</string>
+    <string name="sync_checked">LAST CHECKED AT %1$s</string>
+    <string name="sync_tools">SYNC TOOLS</string>
+    <string name="sync_now">Sync Now</string>
+    <plurals name="sync_pending_count">
+        <item quantity="one">%d local change waiting</item>
+        <item quantity="other">%d local changes waiting</item>
+    </plurals>
+    <string name="sync_unavailable">Cloud sync is not connected. Nothing was uploaded; local changes are preserved.</string>
+</resources>

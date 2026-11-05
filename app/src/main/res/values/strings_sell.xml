@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="sell_search">Search</string>
+    <string name="sell_cart">Cart</string>
+    <string name="sell_pending">Selling and checkout are not implemented in this prototype.</string>
+    <string name="sell_add">Add %1$s to sale (coming soon)</string>
+    <plurals name="sell_available">
+        <item quantity="one">%d available</item>
+        <item quantity="other">%d available</item>
+    </plurals>
+</resources>

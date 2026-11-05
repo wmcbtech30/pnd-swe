@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="common_home">Home</string>
+    <string name="common_sell">Sell</string>
+    <string name="common_inventory">Inventory</string>
+    <string name="common_history">History</string>
+    <string name="common_tools">Tools</string>
+    <string name="common_back">Back</string>
+    <string name="common_filters">Filters</string>
+    <string name="common_cancel">Cancel</string>
+    <string name="common_apply">Apply</string>
+    <string name="common_clear">Clear</string>
+    <string name="common_retry">Retry</string>
+    <string name="common_loading">Loading local data…</string>
+    <string name="common_load_failed">Local data could not be loaded.</string>
+    <string name="common_action_failed">The local change could not be saved. Please try again.</string>
+    <string name="common_no_matches">No matching records</string>
+    <string name="common_all">All</string>
+    <string name="common_saving">Saving…</string>
+    <string name="common_local_storage">OFFLINE · LOCAL STORAGE</string>
+    <string name="common_pending">Pending Sync</string>
+    <string name="common_amount">Php%1$s</string>
+    <plurals name="common_transactions"><item quantity="one">%d transaction</item><item quantity="other">%d transactions</item></plurals>
+    <plurals name="common_items"><item quantity="one">%d item</item><item quantity="other">%d items</item></plurals>
+    <plurals name="common_products"><item quantity="one">%d product</item><item quantity="other">%d products</item></plurals>
+</resources>

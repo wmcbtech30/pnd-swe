@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="filters_products">Product filters</string>
+    <string name="filters_stock">Stock status</string>
+    <string name="filters_available">In stock</string>
+    <string name="filters_low">Low stock</string>
+    <string name="filters_out">Out of stock</string>
+    <string name="filters_vendor">Vendor</string>
+    <string name="filters_category">Category</string>
+    <string name="filters_dates">Date filter</string>
+    <string name="filters_today">Today</string>
+    <string name="filters_week">Last 7 days</string>
+    <string name="filters_month">Last 30 days</string>
+    <string name="filters_all_dates">All dates</string>
+    <string name="filters_custom">Custom range</string>
+    <string name="filters_start">Start date (YYYY-MM-DD)</string>
+    <string name="filters_end">End date (YYYY-MM-DD)</string>
+    <string name="filters_invalid">Enter valid dates with the start date on or before the end date.</string>
+</resources>

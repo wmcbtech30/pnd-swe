@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="product_details_title">Product details</string>
+    <string name="product_details_sku">SKU</string>
+    <string name="product_details_vendor">Vendor</string>
+    <string name="product_details_category">Category</string>
+    <string name="product_details_price">Selling price</string>
+    <string name="product_details_stock">Expected stock</string>
+    <string name="product_details_threshold">Low-stock threshold</string>
+    <string name="product_details_movements">STOCK MOVEMENTS</string>
+    <string name="product_details_empty">No stock movements yet.</string>
+    <string name="product_details_missing">This product is no longer available.</string>
+    <string name="product_details_pending">Receiving, stock adjustments, and physical counts are not implemented yet.</string>
+    <string name="product_details_opening">Opening stock</string>
+    <string name="product_details_movement">%1$s · %2$s</string>
+    <plurals name="product_details_units">
+        <item quantity="one">%d unit</item>
+        <item quantity="other">%d units</item>
+    </plurals>
+    <string name="product_details_edit">Edit product</string>
+</resources>

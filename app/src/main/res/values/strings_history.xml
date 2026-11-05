@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="history_search">Search receipt number</string>
+    <string name="history_summary">Php%1$s · %2$s</string>
+    <string name="history_cash">CASH</string>
+    <string name="history_manual">MOBILE PAYMENT APP</string>
+    <string name="history_metadata">%1$s · %2$s</string>
+    <string name="history_empty">No receipts in this date range.</string>
+</resources>

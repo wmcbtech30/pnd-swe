@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="transaction_details_title">Transaction details</string>
+    <string name="transaction_details_date">Date and time</string>
+    <string name="transaction_details_cashier">Recorded by</string>
+    <string name="transaction_details_payment">Payment method</string>
+    <string name="transaction_details_total">TOTAL</string>
+    <string name="transaction_details_tendered">Amount received</string>
+    <string name="transaction_details_change">Change</string>
+    <string name="transaction_details_items">ITEMS</string>
+    <string name="transaction_details_line">%1$d × Php%2$s</string>
+    <string name="transaction_details_missing">This receipt is no longer available.</string>
+</resources>
