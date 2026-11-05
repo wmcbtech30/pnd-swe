@@ -44,9 +44,10 @@ class ShopViewModel(private val repository: ShopRepository, private val google: 
         cloudBusy = true
         try { return block() } finally { cloudBusy = false }
     }
-    suspend fun discover(resolve: ResolveGoogleConsent) = cloud { google().discover(resolve) }
-    suspend fun connect(account: GoogleAccountInfo, workbook: DriveWorkbook?, title: String, resolve: ResolveGoogleConsent) =
-        cloud { google().connect(account, workbook, title, resolve) }
+    suspend fun selectFile(resolve: ResolveGoogleConsent) = cloud { google().selectFile(resolve) }
+    suspend fun connect(selected: SelectedSpreadsheet, allowMissingPages: Boolean, resolve: ResolveGoogleConsent) =
+        cloud { google().connect(selected, allowMissingPages, resolve) }
+    suspend fun createFile(title: String, resolve: ResolveGoogleConsent) = cloud { google().createFile(title, resolve) }
     suspend fun sync(resolve: ResolveGoogleConsent) = cloud { google().sync(resolve) }
     suspend fun disconnect() = cloud { google().disconnect() }
     suspend fun resetLocalData() { check(!cloudBusy); repository.resetLocalData() }

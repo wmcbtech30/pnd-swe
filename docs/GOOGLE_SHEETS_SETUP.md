@@ -2,8 +2,8 @@
 
 ## Google Cloud setup
 
-Use an existing Google Cloud project. Enable **Google Drive API** and **Google
-Sheets API**. Configure Google Auth Platform branding, audience and Data Access.
+Use an existing Google Cloud project. Enable **Google Drive API**, **Google Sheets API**, and
+**Google Picker API**. Configure Google Auth Platform branding, audience and Data Access.
 During development, keep the audience in Testing and add each tester's Google
 account. Workspace administrators can separately restrict third-party apps.
 
@@ -29,11 +29,17 @@ Requested scopes:
 - `openid`
 - `https://www.googleapis.com/auth/userinfo.email`
 
-`drive.file` confines access to app-authorized files and supports Sheets API
-calls on those files. The native list shows workbooks created and marked by
-this app, including those shared within its accessible set. This is **not**
-a full Google Drive picker. Arbitrary spreadsheet selection/import and Excel
-are pending; an Android storage picker URI would not grant Sheets API access.
+`drive.file` confines access to files explicitly created or selected for Paninda.
+Existing-file selection uses **Google's own Android Picker**, via AuthorizationClient
+with PICKER_OAUTH_TRIGGER, CONSENT, drive.file only and
+setOptOutIncludingGrantedScopes(true). Multi-selection/folder selection are off;
+the MIME filter allows Google Sheets files. Account identity is obtained in a
+separate normal authorization request, because the Picker request cannot combine
+identity scopes. The selected file is verified as editable using Drive metadata.
+
+No custom file list, WebView, browser API key or broad Drive metadata/Sheets scopes
+are used. Enable Google Picker API in this same Cloud project. An Android storage
+picker URI is not used as a substitute for a Google Drive file grant.
 
 Google documents standard Drive/Sheets API use as having no additional cost
 within applicable quotas. This prototype does not require Play Store publishing.
@@ -42,33 +48,35 @@ that is separate from installing a debug APK for an added test user.
 
 ## Device acceptance checklist
 
-Use a physical Android device with Google Play services and internet:
+Use a physical Android device with up-to-date Google Play services, a browser and internet:
 
-1. Fresh install: Google button must launch real account/permission authorization.
-   Cancelling, denying scopes, unavailable network and missing registration must
-   not open Home. Failed setup uses the Figma notice layout. Try Again clears
-   the selected account/workbook and starts setup again.
-2. Create a workbook: read the blanket notice, Proceed, then inspect Drive.
-   A **separate spreadsheet file** named Paninda Workbench contains Meta,
-   Vendors, Products, Sales, SaleItems and StockMovements. Each has headers at
-   A1 and no sample records. Local records retained from a previous connection
-   are uploaded only after the notice explicitly explains this.
-3. Create a product offline, restart the app, then Sync Now online. Check SKU,
-   integer minor-unit price, vendor and opening-stock movement in Sheets.
-4. After a completed sync, edit a valid product value in Sheets while the app
-   is not syncing. Sync with no pending local changes; Inventory must update.
-5. Edit both copies after a sync: Sync must stop for review and preserve both.
-   Check Settings guidance. There is no automatic merge or force-overwrite.
-6. Break a required header: sync must fail without importing. Restore it and
-   retry. This mandatory data-contract check is separate from the **deferred**
-   general-purpose compatibility classifier. The onboarding notice is blanket,
-   never a claim that incompatibility was detected.
-7. Disconnect: confirm revocation, return to onboarding, verify Google's third-
-   party access and that local data/Drive workbook remain. Offline revocation
-   must report failure rather than falsely claim disconnection.
-8. Reconnect to the saved app workbook. Different nonempty local data must cause
-   a conflict; fresh/empty local storage can import the workbook. Local reset
-   discards unsynced device records but never uploads deletion of the workbook.
+1. Fresh install: Google button opens a gradient-banner choice: **Choose an
+   existing file** or **Create a new file**. Existing selection launches Google's
+   Picker; cancellation, denied permissions or network failure never open Home.
+2. New file: enter a name, confirm creation and authorize Google. Inspect Drive:
+   the file contains `Meta (Paninda)`, `Vendors (Paninda)`, `Products (Paninda)`,
+   `Sales (Paninda)`, `SaleItems (Paninda)` and `StockMovements (Paninda)`.
+   Headers start at A1. No sample records. Retained device records are uploaded.
+3. Select an empty existing file: initialize app worksheets inside it without a
+   warning. Select a nonempty existing file missing required app worksheets:
+   show the Figma warning **before any mutation**. Proceed adds only missing/
+   empty app worksheets; other worksheets and their data remain unchanged.
+4. Select a compliant file: connect directly without a compatibility warning.
+   Invalid existing (Paninda) headers/records fail validation rather than being
+   overwritten. A complete valid legacy layout from the previous APK is renamed
+   in place with `(Paninda)` suffixes. Earlier APKs expect the old names; use the
+   current APK after migration.
+5. Create a product offline, restart, then Sync Now online. Check SKU, minor-unit
+   price, vendor and opening movement. Remote-only valid edits should import;
+   divergent local/remote edits must stop with Settings conflict suggestions.
+6. Break a required header or remove a required app worksheet: sync must fail
+   without importing/clearing local changes. Repair the file and retry.
+7. Disconnect: verify actual Google revocation, return to onboarding and confirm
+   local data/Drive file remain. Offline revocation must report failure.
+8. Reconnect via Google Picker. One selected file ID/account binding is stored
+   per device. A local reset discards unsynced device records, never the remote
+   file. Empty valid app worksheets can receive retained local records safely;
+   different nonempty copies without a common baseline require conflict review.
 
 ## Sync and recovery limits
 
@@ -85,7 +93,7 @@ local-only changes, acknowledges identical snapshots, and stops on divergence.
 Imports and acknowledgements use a Room transaction with a local-hash guard:
 edits made during network work cannot be silently discarded/acknowledged.
 
-Writes use one Sheets batch for the six canonical tables, stringValue cells
+Writes use one Sheets batch for the six suffixed app worksheets, stringValue cells
 (no formula execution), and no changes to unrelated worksheets. Original exact
 header order is required by the live adapter to avoid reassigning fields while
 writing; the pure mapper remains tolerant of reordered input for future import.
@@ -100,8 +108,7 @@ write protocol is required before reliable concurrent-device operation.
 
 A timed-out creation/upload may already have reached Google. No automatic
 mutation retry or deletion is performed. Review Drive before creating another
-workbook; partially initialized workbooks may remain there. A workbook is marked
-reconnectable only after its initial write and verification succeed. A lost
+workbook; partially initialized workbooks may remain there. A lost
 response after a normal upload can converge safely on retry when both copies
 match. Recovery does not merge divergent rows or recover deleted local-only data.
 
@@ -113,6 +120,7 @@ device. Clearing app storage/uninstalling is independent of revoking Google acce
 
 ## References
 
+- https://developers.google.com/workspace/drive/picker/guides/desktop-mobile-picker
 - https://developer.android.com/identity/authorization
 - https://developers.google.com/workspace/drive/api/guides/api-specific-auth
 - https://developers.google.com/workspace/sheets/api/reference/rest/v4/spreadsheets/batchUpdate

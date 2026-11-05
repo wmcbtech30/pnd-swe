@@ -19,6 +19,7 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 
 fun connectionError(error: Exception): Int = when {
+    error is FileSelectionException -> R.string.connection_selection_body
     error is SyncVerificationException -> R.string.connection_verification_body
     error is SyncConflictException -> R.string.connection_conflict_body
     error is WorkbookFormatException -> R.string.connection_format_body
@@ -32,28 +33,40 @@ fun connectionError(error: Exception): Int = when {
 @Composable
 fun ConnectionFlow(vm: ShopViewModel, resolve: ResolveGoogleConsent) {
     var stage by remember { mutableStateOf("start") }
-    var account by remember { mutableStateOf<GoogleAccountInfo?>(null) }
-    var workbooks by remember { mutableStateOf(emptyList<DriveWorkbook>()) }
-    var selected by remember { mutableStateOf<DriveWorkbook?>(null) }
+    var selected by remember { mutableStateOf<SelectedSpreadsheet?>(null) }
     var failure by remember { mutableIntStateOf(R.string.connection_failed_body) }
     val scope = rememberCoroutineScope()
-    val title = stringResource(R.string.workbooks_default_name)
-    fun startOver() { stage = "start"; account = null; workbooks = emptyList(); selected = null }
-    fun begin() {
+    fun startOver() { stage = "start"; selected = null }
+    fun attach(approved: Boolean) {
         if (vm.cloudBusy) return
-        startOver()
+        stage = "loading"
+        scope.launch {
+            try { vm.connect(requireNotNull(selected), approved, resolve) }
+            catch (e: CancellationException) { throw e }
+            catch (e: WorkbookApprovalRequired) {
+                selected = selected?.copy(inspection = e.inspection)
+                stage = "warning"
+            }
+            catch (e: Exception) { failure = connectionError(e); stage = "failed" }
+        }
+    }
+    fun chooseExisting() {
+        if (vm.cloudBusy) return
+        selected = null
         stage = "loading"
         scope.launch {
             try {
-                val result = vm.discover(resolve)
-                account = result.first; workbooks = result.second; stage = "choose"
+                val result = vm.selectFile(resolve)
+                selected = result
+                if (result.inspection.requiresWarning) stage = "warning"
+                else attach(false)
             } catch (e: CancellationException) { throw e }
             catch (e: Exception) { failure = connectionError(e); stage = "failed" }
         }
     }
     when (stage) {
         "loading" -> {
-            BackHandler { /* Finish or cancel the Google consent dialog before restarting. */ }
+            BackHandler { }
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     CircularProgressIndicator()
@@ -62,16 +75,19 @@ fun ConnectionFlow(vm: ShopViewModel, resolve: ResolveGoogleConsent) {
                 }
             }
         }
-        "choose" -> WorkbookSelectionScreen(requireNotNull(account), workbooks, vm.cloudBusy, ::startOver,
-            { selected = null; stage = "warning" }, { selected = it; stage = "warning" })
-        "warning" -> ConnectionNoticeScreen(false, selected != null, vm.cloudBusy, onStartOver = ::startOver, onProceed = {
+        "source" -> FileSourceScreen(::startOver, ::chooseExisting, { stage = "new" })
+        "new" -> NewFileScreen(vm.cloudBusy, { stage = "source" }) { name ->
             if (!vm.cloudBusy) scope.launch {
-                try { vm.connect(requireNotNull(account), selected, title, resolve) }
+                try { vm.createFile(name, resolve) }
                 catch (e: CancellationException) { throw e }
                 catch (e: Exception) { failure = connectionError(e); stage = "failed" }
             }
-        })
-        "failed" -> ConnectionNoticeScreen(true, onStartOver = ::startOver, onProceed = ::begin, bodyOverride = failure)
-        else -> OnboardingScreen(onContinue = ::begin)
+        }
+        "warning" -> ConnectionNoticeScreen(false, vm.cloudBusy, onStartOver = ::startOver,
+            onProceed = { attach(true) }, fileName = selected?.file?.name,
+            missingPages = selected?.inspection?.missingPages.orEmpty())
+        "failed" -> ConnectionNoticeScreen(true, onStartOver = ::startOver,
+            onProceed = { selected = null; stage = "source" }, bodyOverride = failure)
+        else -> OnboardingScreen(onContinue = { stage = "source" })
     }
 }

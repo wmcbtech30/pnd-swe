@@ -95,5 +95,11 @@ class WorkbookSynchronizerTest {
         assertEquals("NEW-LOCAL", repo.snapshot().products.single().sku)
         assertTrue(db.shopDao().pending().isNotEmpty())
         assertEquals(0, remote.writes)
+        // Connecting retained local records to newly initialized empty app worksheets is safe.
+        remote.snapshot = ShopSnapshot()
+        remote.onRead = {}
+        WorkbookSynchronizer(repo).sync(remote, binding)
+        assertEquals("NEW-LOCAL", remote.snapshot.products.single().sku)
+        assertTrue(db.shopDao().pending().isEmpty())
     }
 }

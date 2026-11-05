@@ -11,6 +11,8 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
 data class WorkbookBinding(val id: String, val name: String, val subject: String, val email: String)
+data class SelectedSpreadsheet(val account: GoogleAccountInfo, val file: DriveWorkbook, val inspection: WorkbookInspection)
+class WorkbookApprovalRequired(val inspection: WorkbookInspection) : IllegalStateException("Existing file needs missing Paninda worksheets")
 class SyncConflictException : IllegalStateException("Local and workbook changes need review")
 typealias ResolveGoogleConsent = suspend (PendingIntent) -> Intent
 
@@ -18,32 +20,43 @@ typealias ResolveGoogleConsent = suspend (PendingIntent) -> Intent
 class GoogleWorkbookSync(private val repository: ShopRepository, private val authorization: GoogleAuthorization) {
     private val mutex = Mutex()
 
-    suspend fun discover(resolve: ResolveGoogleConsent): Pair<GoogleAccountInfo, List<DriveWorkbook>> = mutex.withLock {
-        withGoogle(null, resolve) { http -> DriveWorkbooks(http).let { it.account() to it.list() } }
+    suspend fun selectFile(resolve: ResolveGoogleConsent): SelectedSpreadsheet = mutex.withLock {
+        val account = withGoogle(null, resolve) { DriveWorkbooks(it).account() }
+        val id = authorization.pickFile(account.email, resolve)
+        withGoogle(account.email, resolve) { http ->
+            check(DriveWorkbooks(http).account().subject == account.subject) { "Google account changed" }
+            val file = DriveWorkbooks(http).selected(id)
+            SelectedSpreadsheet(account, file, GoogleSheetsAdapter(http, file.id).inspect())
+        }
     }
 
-    suspend fun connect(account: GoogleAccountInfo, workbook: DriveWorkbook?, title: String,
+    suspend fun connect(selected: SelectedSpreadsheet, allowMissingPages: Boolean,
         resolve: ResolveGoogleConsent) = mutex.withLock {
-        withGoogle(account.email, resolve) { http ->
-            val actual = DriveWorkbooks(http).account()
-            check(actual.subject == account.subject) { "Google account changed; start again" }
-            if (workbook == null) {
-                val local = repository.snapshot()
-                val expected = SnapshotFingerprint.of(local)
-                val created = GoogleSheetsAdapter.create(http, title)
-                // Mark after data is fully written: incomplete creation is never advertised as reconnectable.
-                val adapter = GoogleSheetsAdapter(http, created.id)
-                adapter.write(local)
-                val verified = adapter.readSnapshot()
-                if (SnapshotFingerprint.of(verified) != expected) throw SyncVerificationException()
-                DriveWorkbooks(http).mark(created.id)
-                repository.completeSync(WorkbookBinding(created.id, created.name, actual.subject, actual.email),
-                    verified, expected, download = false)
-            } else {
-                // Only IDs freshly listed for this account may be adopted; no arbitrary URL/ID import.
-                check(DriveWorkbooks(http).list().any { it.id == workbook.id }) { "Workbook is no longer accessible" }
-                syncWith(http, WorkbookBinding(workbook.id, workbook.name, actual.subject, actual.email))
-            }
+        withGoogle(selected.account.email, resolve) { http ->
+            val account = DriveWorkbooks(http).account()
+            check(account.subject == selected.account.subject) { "Google account changed" }
+            val file = DriveWorkbooks(http).selected(selected.file.id)
+            val adapter = GoogleSheetsAdapter(http, file.id)
+            val inspection = adapter.inspect() // Recheck after consent; never rely on the earlier warning snapshot.
+            if (inspection.requiresWarning && !allowMissingPages) throw WorkbookApprovalRequired(inspection)
+            adapter.initializePages(inspection)
+            WorkbookSynchronizer(repository).sync(adapter, WorkbookBinding(file.id, file.name, account.subject, account.email))
+        }
+    }
+
+    suspend fun createFile(title: String, resolve: ResolveGoogleConsent) = mutex.withLock {
+        require(title.isNotBlank() && title.trim().length <= 120)
+        withGoogle(null, resolve) { http ->
+            val account = DriveWorkbooks(http).account()
+            val local = repository.snapshot()
+            val expected = SnapshotFingerprint.of(local)
+            val created = GoogleSheetsAdapter.create(http, title.trim())
+            val adapter = GoogleSheetsAdapter(http, created.id)
+            adapter.write(local)
+            val verified = adapter.readSnapshot()
+            if (SnapshotFingerprint.of(verified) != expected) throw SyncVerificationException()
+            repository.completeSync(WorkbookBinding(created.id, created.name, account.subject, account.email),
+                verified, expected, download = false)
         }
     }
 
@@ -56,7 +69,11 @@ class GoogleWorkbookSync(private val repository: ShopRepository, private val aut
     }
 
     private suspend fun syncWith(http: GoogleHttp, binding: WorkbookBinding) {
-        WorkbookSynchronizer(repository).sync(GoogleSheetsAdapter(http, binding.id), binding)
+        val adapter = GoogleSheetsAdapter(http, binding.id)
+        val inspection = adapter.inspect()
+        if (inspection.canRenameLegacy) adapter.initializePages(inspection)
+        else if (inspection.missingPages.isNotEmpty()) throw WorkbookFormatException("Missing Paninda worksheets")
+        WorkbookSynchronizer(repository).sync(adapter, binding)
     }
 
     suspend fun disconnect() = mutex.withLock {

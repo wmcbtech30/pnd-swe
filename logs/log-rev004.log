@@ -1,0 +1,91 @@
+Paninda revision 004 — selected file, native Picker and conditional worksheet setup
+Date: 2026-11-05 (UTC)
+Branch: litmus_2
+Base: 665efcf
+
+CORRECTED REQUIREMENTS
+- One selected Google Sheets file per device.
+- Use Google's own picker, not a custom app-created-file list.
+- Onboarding offers either an existing file or explicit creation of a named file.
+- Required data worksheets live INSIDE that file, suffixed with " (Paninda)".
+- Warn only when a selected file contains cell data AND is missing required app
+  worksheets. Empty/compliant files do not receive a blanket warning.
+- New onboarding choices/forms must share the existing gradient banner.
+This revision supersedes log-rev003's blanket-warning/separate-file-only behavior.
+
+IMPLEMENTATION
+- Native Google Picker through AuthorizationClient PICKER_OAUTH_TRIGGER, CONSENT,
+  drive.file ONLY, and setOptOutIncludingGrantedScopes(true). MIME restricted to
+  Google Sheets; multi-file/folder selection disabled; exactly one returned ID
+  required. Account identity uses a separate authorization request.
+- Removed the custom workbook-list screen and appProperties-based discovery.
+  Reads Drive metadata only for the selected file; verifies type/editability.
+- Enable Google Picker API in the same Cloud project as Drive/Sheets. Existing
+  Android OAuth package/SHA-1 registration is unchanged. No new API key, WebView,
+  Web client ID, or broad Drive/Sheets scope is introduced.
+- Gradient-banner FileSourceScreen asks Existing vs New. NewFileScreen asks for
+  a file name and explicitly creates only when confirmed. Error retry clears the
+  selected file and returns to this setup choice.
+- Shared ConnectionPage keeps the Figma gradient/serif banner, scrolling body and
+  fixed actions. Keyboard insets keep the new-file action accessible.
+- Physical worksheet names:
+    Meta (Paninda)
+    Vendors (Paninda)
+    Products (Paninda)
+    Sales (Paninda)
+    SaleItems (Paninda)
+    StockMovements (Paninda)
+  Internal mapper names remain unchanged, keeping existing domain fingerprints
+  and the version-1 data contract stable.
+- Inspect selected-file worksheet names and entered cells using FORMULA rendering
+  so formulas returning empty strings still count as data. Missing worksheet names
+  plus nonempty file data determine whether the warning is needed. Once all app
+  worksheets exist, unrelated worksheet contents need not be scanned.
+- Reinspect before initialization. If the file became nonempty/missing worksheets
+  since selection, request the warning first. No initial mutation before approval.
+- Proceed adds only missing app worksheets and initializes genuinely empty app
+  worksheets at A1. Stage/validate existing app data in memory before modifying
+  the file. Malformed app headers/data fail rather than being overwritten.
+  Unrelated worksheets, including unsuffixed name collisions, are preserved.
+- Recognize a complete valid legacy six-worksheet layout from the previous APK
+  and rename those worksheets in place with the requested suffix. No record copy,
+  deletion or reseeding. The current APK is needed afterward; earlier APKs expect
+  the unsuffixed names.
+- Local-first synchronization/conflict guards remain. An empty valid remote app
+  dataset can receive retained local records even without a previous shared
+  baseline; different nonempty copies still stop for review.
+- Regular Sync Now does not silently recreate deleted app worksheets. It reports
+  the missing schema and preserves local records for repair/reconnection.
+- Updated page-specific strings and current setup/status/schema documentation.
+  The Google logo placeholder and other pending business features are unchanged.
+
+VERIFICATION
+- All 16 maintained focused checks passed in the first build/test/lint pass.
+  Three new data-policy tests cover warning conditions, protecting unrelated or
+  malformed data, and recognizing valid legacy layouts. Existing sync test also
+  covers uploading retained local records into newly initialized empty targets.
+- Native Picker request/API symbols compile against the existing auth SDK 22.0.0.
+  Google's official Android Picker documentation was checked:
+  https://developers.google.com/workspace/drive/picker/guides/desktop-mobile-picker
+- No maintained layout tests, screenshot baselines or size matrix added. Temporary
+  direct-render inspection uses ignored work/ only.
+- Final build/lint/render outcomes are appended after completion.
+
+REMAINING ACCEPTANCE / LIMITS
+- Google's actual Picker UI and account/file grant must be verified on a physical
+  Play-services device after enabling Picker API. No live-device success claim
+  is made from unit tests or preview renders.
+- Existing single-writer/manual-sync limits remain: no conditional Sheets CAS,
+  background worker, automatic merge or force-overwrite resolution.
+- No arbitrary Excel/table import or automatic repair of malformed app data.
+- Interrupted file creation may leave a file in Drive; review it before retrying.
+
+FINAL CHECKS
+- Final assembleDebug + lintDebug succeeded. Android lint: 0 errors. Remaining
+  notices concern available dependency versions and optional toUri/KTX style.
+- All 16 maintained regression checks passed again; the temporary direct-render
+  harness also completed. Inspected source-choice, named new-file and compact
+  large-text conditional-warning screens. Gradient/banner/actions are consistent;
+  warning content and worksheet list scroll separately from the bottom actions.
+- APK: app/build/outputs/apk/debug/app-debug.apk. No Google Drive upload or Git
+  remote push requested for this correction turn; commit is local.

@@ -3,7 +3,9 @@
 This is the mapping contract in `adapters/sheets/`. The Google adapter uses it
 to create, read and write app-owned workbooks; Room remains the working store.
 
-Each table occupies its own worksheet. Headers start at A1 in row 1; records
+Each table occupies its own worksheet, named with a ` (Paninda)` suffix (for
+example, `Products (Paninda)`). Internal mapper table keys remain `Products`,
+etc., so domain snapshot fingerprints do not change during the name migration. Headers start at A1 in row 1; records
 start at row 2. One record occupies one row. No merged cells, title rows, or
 subtotal rows belong inside these tables. Worksheet names and header names are
 case-sensitive. The pure mapper accepts reordered columns and additional named columns, but
@@ -12,12 +14,12 @@ original exact header order, preventing writes from reassigning manual columns.
 
 | Worksheet | Headers, left to right from A1 |
 | --- | --- |
-| Meta | `key, value` |
-| Vendors | `vendor_id, name` |
-| Products | `product_id, sku, name, vendor_id, category, unit_price_minor, low_stock_threshold, is_active, updated_at, version` |
-| Sales | `sale_id, receipt_number, sold_at, cashier_name, payment_method, total_minor, amount_tendered_minor, item_count` |
-| SaleItems | `sale_item_id, sale_id, product_id, product_name_snapshot, vendor_id_snapshot, quantity, unit_price_minor` |
-| StockMovements | `movement_id, product_id, quantity_delta, movement_type, source_id, occurred_at, reason` |
+| Meta (Paninda) | `key, value` |
+| Vendors (Paninda) | `vendor_id, name` |
+| Products (Paninda) | `product_id, sku, name, vendor_id, category, unit_price_minor, low_stock_threshold, is_active, updated_at, version` |
+| Sales (Paninda) | `sale_id, receipt_number, sold_at, cashier_name, payment_method, total_minor, amount_tendered_minor, item_count` |
+| SaleItems (Paninda) | `sale_item_id, sale_id, product_id, product_name_snapshot, vendor_id_snapshot, quantity, unit_price_minor` |
+| StockMovements (Paninda) | `movement_id, product_id, quantity_delta, movement_type, source_id, occurred_at, reason` |
 
 Required metadata:
 
@@ -55,6 +57,7 @@ the schema explicitly when those workflows are designed.
 Import validation is pure and rejects malformed data before any database write.
 The live Google adapter imports valid app-owned workbooks into Room transactionally.
 It requires the original canonical header order; the pure mapper still accepts
-reordered headers for future import workflows. General arbitrary-workbook
-compatibility detection/import is deferred. See GOOGLE_SHEETS_SETUP.md for sync
+reordered headers for future import workflows. Existing-file setup checks for missing app worksheets and existing cell data.
+It adds only app worksheets after any required warning; unrelated data is not
+imported into the domain model. See GOOGLE_SHEETS_SETUP.md for sync
 conflict policy, single-writer limits and connection setup.

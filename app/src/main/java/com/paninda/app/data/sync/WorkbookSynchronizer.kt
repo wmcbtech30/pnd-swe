@@ -17,7 +17,7 @@ class WorkbookSynchronizer(private val repository: ShopRepository) {
         val localHash = SnapshotFingerprint.of(local)
         val remote = read()
         val remoteHash = SnapshotFingerprint.of(remote)
-        when (SyncPolicy.decide(repository.baseFor(binding), localHash, remoteHash, local == ShopSnapshot())) {
+        when (SyncPolicy.decide(repository.baseFor(binding), localHash, remoteHash, local == ShopSnapshot(), remote == ShopSnapshot())) {
             SyncDecision.CONFLICT -> throw SyncConflictException()
             SyncDecision.DOWNLOAD -> repository.completeSync(binding, remote, localHash, download = true)
             SyncDecision.UNCHANGED -> repository.completeSync(binding, remote, localHash, download = false)

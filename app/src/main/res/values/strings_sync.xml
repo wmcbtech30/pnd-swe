@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="sync_title">Sync Status</string>
-    <string name="sync_explanation">Changes are saved on this device first. Tap Sync Now to exchange changes with your workbook. Internet and Google authorization are required only for connection and sync.</string>
+    <string name="sync_explanation">Changes are saved on this device first. Tap Sync Now to exchange changes with your file. Internet and Google authorization are required only for connection and sync.</string>
     <string name="sync_never">No cloud sync has been performed</string>
     <string name="sync_checked">LAST SYNCED AT %1$s</string>
     <string name="sync_tools">SYNC TOOLS</string>
@@ -10,13 +10,13 @@
         <item quantity="one">%d local change waiting</item>
         <item quantity="other">%d local changes waiting</item>
     </plurals>
-    <string name="sync_synced">Workbook synced</string>
+    <string name="sync_synced">File synced</string>
     <string name="sync_pending">Local changes pending</string>
     <string name="sync_conflict">Review changes</string>
-    <string name="sync_incompatible">Check workbook format</string>
+    <string name="sync_incompatible">Check file format</string>
     <string name="sync_access">Check Google access</string>
     <string name="sync_failed">Sync interrupted</string>
     <string name="sync_ready">Ready to sync</string>
     <string name="sync_working">Syncing…</string>
-    <string name="sync_done">Workbook sync completed. Newer local edits remain pending.</string>
+    <string name="sync_done">File sync completed. Newer local edits remain pending.</string>
 </resources>
