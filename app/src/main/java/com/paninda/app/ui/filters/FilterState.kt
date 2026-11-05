@@ -19,5 +19,5 @@ fun rememberProductFilter(initial: StockFilter = StockFilter.ALL): MutableState<
     rememberSaveable(stateSaver = ProductSaver) { mutableStateOf(ProductFilter(initial)) }
 
 @Composable
-fun rememberDateFilter(): MutableState<DateFilter> =
-    rememberSaveable(stateSaver = DateSaver) { mutableStateOf(DateFilter()) }
+fun rememberDateFilter(initial: DateRange = DateRange.TODAY): MutableState<DateFilter> =
+    rememberSaveable(stateSaver = DateSaver) { mutableStateOf(DateFilter(initial)) }

@@ -1,0 +1,72 @@
+Paninda revision 008 — inventory reports under Tools
+Date: 2026-11-05 (UTC)
+Branch: litmus_3
+Base: 52fb291
+
+REQUEST / PRIORITIES
+Implement Inventory Reports under Tools, using the existing card aesthetic and
+an appropriate chart, referenced from Figma MAc7bCMKF4RDYbCYQetqt9 node 1:3.
+POS remains excluded; automatic sync remains last priority. Receiving, physical
+counts and variance entry are separate pending workflows, not invented data.
+Continue the requested fresh-schema testing workflow: no compatibility/upgrades.
+
+IMPLEMENTED
+- Tools Reports opens Inventory Reports; Stock Movements is a separate subpage.
+  Each page has its own Kotlin file and string resource file. Existing chevron,
+  fixed title/filter controls, portrait behavior and bottom navigation reused.
+- Reference inspected with Figma design context and screenshot. Reuses pale blue
+  rounded cards, red warnings, serif labels and large thin condensed values.
+  Existing Material icons substitute the reference icons as authorized. No new
+  chart dependency, image asset, palette color or sample business records added.
+- Current stock report: active product units, low/out-of-stock counts and stock
+  estimated at current selling prices. This is explicitly not cost/revenue/profit.
+  Negative balances remain in net unit totals; only positive on-hand quantities
+  contribute to value/chart. A negative-stock explanation appears when relevant.
+  BigInteger valuation prevents Long multiplication/sum overflow.
+- Horizontal bars compare units on hand by vendor using a common scale and
+  numeric labels; zero-stock vendors display zero without a fake bar. No pie
+  chart because vendor names and quantities read more clearly as labeled bars.
+- Existing stock/vendor/category filter bottom sheet drives current cards,
+  chart and product rows together. Clear restores all active products. Empty
+  installs and no-match filters show honest empty states. Product rows open
+  existing details. Scrolling is isolated to the report body.
+- Stock Movements: all recorded opening/imported activity, added/removed/net
+  units and dated reason/type/product rows. Separate date and vendor sheets;
+  all dates defaults, including archived products and vendors. Vendor filtering
+  uses the product's current assignment, disclosed in the filter sheet.
+  Date filtering applies to recorded activity, not historical stock balances.
+- Room movement observation flows into ShopState. Both pages update after local
+  changes/imports/reset and work offline without Google/network requests.
+  Shared date filtering now accepts timestamps and retains existing receipt rules.
+- No database columns, worksheet headers, schema versions, migrations or sync
+  behavior changed. No POS, receiving/count entry or automatic sync added.
+- Updated prototype status and device acceptance checklist.
+
+VERIFICATION
+Results appended after completing build, focused checks and visual inspection.
+Two focused calculation checks cover stock buckets, filters, shortages, large
+values, vendor totals, Manila date boundaries and archived-product activity.
+Existing behavior smoke expanded for Tools → Reports → Stock Movements and
+vendor selection with/without recorded activity. No maintained layout tests.
+Temporary ignored renders contain test-only data and remain under work/reports/.
+
+LIMITATIONS
+No historical as-of stock reconstruction, count variance, cost/profit, report
+export or dedicated receiving report. Movement type/reason rows can display
+valid imported activity; this does not implement stock-entry workflows.
+Real-device and live-Google acceptance remain separate from local checks.
+No GitHub push or Drive upload requested in this turn.
+
+FINAL CHECKS
+- assembleDebug + lintDebug succeeded. Android lint: zero errors.
+- All 22 maintained checks passed (zero failures/errors). The two new report
+  calculation checks and expanded report navigation/filter smoke passed.
+- The smoke initially selected an overlapping FAB on the small test viewport;
+  invoking the vendor row's semantic click fixed that test interaction. No
+  unrelated vendor layout change was made.
+- Inspected overview, vendor chart, empty state and movement renders. A fresh
+  compact/large-font render confirmed title/back controls and wrapping; changing
+  font scale mid-capture had left stale draw output in the temporary renderer.
+  No maintained layout tests or screenshot baselines were added.
+- APK: app/build/outputs/apk/debug/app-debug.apk.
+- Changes committed locally on litmus_3; no GitHub push or Drive upload requested.

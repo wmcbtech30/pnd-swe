@@ -39,7 +39,11 @@ data class DateFilter(
     }.getOrDefault(false)
 
     fun matches(transaction: Transaction, today: LocalDate): Boolean {
-        val date = Instant.ofEpochMilli(transaction.soldAt).atZone(ShopZone).toLocalDate()
+        return matches(transaction.soldAt, today)
+    }
+
+    fun matches(timestamp: Long, today: LocalDate): Boolean {
+        val date = Instant.ofEpochMilli(timestamp).atZone(ShopZone).toLocalDate()
         return when (range) {
             DateRange.TODAY -> date == today
             DateRange.WEEK -> date >= today.minusDays(6) && date <= today

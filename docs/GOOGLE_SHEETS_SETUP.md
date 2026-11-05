@@ -91,6 +91,13 @@ Use a physical Android device with up-to-date Google Play services, a browser an
     `Vendors (Paninda)` columns; on a separate clean install connect the same
     current-schema file to verify contacts, links and archive state import.
 
+11. Tools → Reports: confirm stock totals, selling-price estimate, stock warnings
+    and labeled vendor bars match local products, including unsynced edits. Filter
+    by stock/vendor/category. Open Stock movements and check recorded quantities,
+    date ranges (Manila time) and current-vendor filtering. Restart offline and
+    confirm reports still work. Sync valid remote movements and verify reports
+    refresh without reopening. Current stock cards are not historical balances.
+
 ## Sync and recovery limits
 
 Room is the working database and remains available offline after connection.

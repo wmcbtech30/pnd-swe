@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="movement_reports_scope">RECORDED LOCAL STOCK ACTIVITY</string>
+    <string name="movement_reports_dates">Filter movement dates</string>
+    <string name="movement_reports_vendor">Filter movement vendor</string>
+    <string name="movement_reports_all_vendors">All vendors</string>
+    <string name="movement_reports_filters">%1$s · %2$s</string>
+    <string name="movement_reports_range">%1$s to %2$s</string>
+    <string name="movement_reports_net">Net unit change</string>
+    <plurals name="movement_reports_count">
+        <item quantity="one">Across %1$d recorded movement</item>
+        <item quantity="other">Across %1$d recorded movements</item>
+    </plurals>
+    <string name="movement_reports_added">Units added</string>
+    <string name="movement_reports_removed">Units removed</string>
+    <string name="movement_reports_note">Activity includes opening stock and imported movements. Date filters apply to activity, not current stock. Counts and receiving entry are not available yet.</string>
+    <string name="movement_reports_vendor_note">Uses each product’s current vendor, including archived vendors and products.</string>
+    <string name="movement_reports_empty">No recorded movements match these filters.</string>
+    <string name="movement_reports_product">%1$s · %2$s</string>
+    <string name="movement_reports_delta">%1$s · %2$s units</string>
+    <string name="movement_reports_opening">Opening stock</string>
+    <string name="movement_reports_receiving">Receiving</string>
+    <string name="movement_reports_adjustment">Adjustment</string>
+    <string name="movement_reports_sale">Imported sale</string>
+</resources>

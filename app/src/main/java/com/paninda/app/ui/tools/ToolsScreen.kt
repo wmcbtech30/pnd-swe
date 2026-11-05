@@ -17,7 +17,7 @@ import com.paninda.app.R
 import com.paninda.app.ui.components.*
 
 @Composable
-fun ToolsScreen(onVendors: () -> Unit, onSync: () -> Unit, onSettings: () -> Unit, onPending: (Int) -> Unit) {
+fun ToolsScreen(onReports: () -> Unit, onVendors: () -> Unit, onSync: () -> Unit, onSettings: () -> Unit, onPending: (Int) -> Unit) {
     PageScaffold(stringResource(R.string.common_tools)) { padding ->
         Column(Modifier.fillMaxSize().padding(padding).verticalScroll(rememberScrollState())
             .padding(start = 26.dp, end = 22.dp, top = 12.dp, bottom = 24.dp)) {
@@ -29,7 +29,7 @@ fun ToolsScreen(onVendors: () -> Unit, onSync: () -> Unit, onSettings: () -> Uni
             Spacer(Modifier.height(24.dp))
             SectionLabel(stringResource(R.string.tools_insights))
             Spacer(Modifier.height(8.dp))
-            MenuRow(stringResource(R.string.tools_reports), Icons.Outlined.BarChart) { onPending(R.string.tools_reports_pending) }
+            MenuRow(stringResource(R.string.tools_reports), Icons.Outlined.BarChart) { onReports() }
             Spacer(Modifier.height(24.dp))
             SectionLabel(stringResource(R.string.tools_application))
             Spacer(Modifier.height(8.dp))

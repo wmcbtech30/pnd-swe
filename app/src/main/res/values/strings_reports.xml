@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="reports_title">Inventory reports</string>
+    <string name="reports_current">CURRENT LOCAL INVENTORY</string>
+    <string name="reports_filter">Filter inventory reports</string>
+    <string name="reports_filtered">Filtered active products</string>
+    <string name="reports_all">All active products · includes unsynced changes</string>
+    <string name="reports_empty">No active products yet. Add products in Inventory to see your reports.</string>
+    <string name="reports_units">Stock on hand</string>
+    <plurals name="reports_products_count">
+        <item quantity="one">Units across %1$d product</item>
+        <item quantity="other">Units across %1$d products</item>
+    </plurals>
+    <string name="reports_low">Low stock</string>
+    <string name="reports_out">Out of stock</string>
+    <string name="reports_value">Stock at selling prices</string>
+    <string name="reports_value_note">Positive quantities × current selling price. This is an estimate, not cost, revenue or profit.</string>
+    <string name="reports_negative">%1$d products have negative stock. Totals include shortages; value and chart exclude negative quantities.</string>
+    <string name="reports_vendor_stock">STOCK BY VENDOR</string>
+    <string name="reports_chart_note">Units on hand, excluding negative quantities. Each bar uses the same scale.</string>
+    <string name="reports_vendor_bar">%1$s · %2$d units</string>
+    <string name="reports_stock_list">PRODUCT STOCK</string>
+    <string name="reports_movements">Stock movements</string>
+</resources>

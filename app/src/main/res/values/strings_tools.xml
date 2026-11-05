@@ -9,5 +9,4 @@
     <string name="tools_sync">Sync Status</string>
     <string name="tools_settings">Settings</string>
     <string name="tools_counts_pending">Stock counting is not implemented yet.</string>
-    <string name="tools_reports_pending">Reports are not implemented yet.</string>
 </resources>

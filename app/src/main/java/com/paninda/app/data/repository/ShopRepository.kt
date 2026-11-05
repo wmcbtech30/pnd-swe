@@ -14,7 +14,7 @@ import com.paninda.app.data.sync.WorkbookBinding
 
 class ShopRepository(private val db: PanindaDatabase, private val clock: Clock = Clock.systemUTC()) {
     private val dao = db.shopDao()
-    val state = combine(dao.observeProducts(), dao.observeTransactions(),
+    private val baseState = combine(dao.observeProducts(), dao.observeTransactions(),
         dao.observePendingCount(), dao.observeState(), dao.observeVendors()) { products, transactions, pending, settings, vendors ->
         val values = settings.associate { it.key to it.value }
         ShopState(loading = values["initialized"] != "true", connected = values["connected"] == "true" && !values["workbook_id"].isNullOrBlank(),
@@ -22,6 +22,10 @@ class ShopRepository(private val db: PanindaDatabase, private val clock: Clock =
             pendingCount = pending, lastCheckedAt = values["last_checked"]?.toLongOrNull(),
             vendors = vendors.map { it.toDomain() }, workbookName = values["workbook_name"], accountEmail = values["account_email"],
             syncStatus = if (pending > 0 && values["sync_status"] == "synced") "pending" else values["sync_status"] ?: "idle")
+    }
+
+    val state = combine(baseState, dao.observeMovements()) { state, movements ->
+        state.copy(movements = movements.map { it.toDomain() })
     }
 
     suspend fun initialize() = db.withTransaction {

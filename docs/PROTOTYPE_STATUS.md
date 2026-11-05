@@ -1,7 +1,7 @@
 # Prototype status
 
 Branch: `litmus_3`, continuing the local-first prototype from `litmus_2`.
-Historical decisions and checks remain in `logs/log-rev000.log` through 007.
+Historical decisions and checks remain in `logs/log-rev000.log` through 008.
 
 ## Implemented
 
@@ -62,6 +62,14 @@ Historical decisions and checks remain in `logs/log-rev000.log` through 007.
 - Vendor IDs remain stable across renames; edits queue for explicit Sheets sync.
   Contacts, archive state, timestamps and versions round-trip through the adapter.
 
+- Tools → Reports: current active-product stock, low/out-of-stock counts, a
+  selling-price stock estimate, and a labeled horizontal bar chart by vendor.
+  Stock/vendor/category filters apply to cards, bars and linked product rows.
+- Separate Stock Movements report: added/removed/net units and recorded rows,
+  with Manila-time date ranges and current-vendor filters. Includes opening stock
+  and valid imported movements, including archived products/vendors. Both reports
+  react to Room changes and work offline; no report fixtures are packaged.
+
 ## Operational limits and pending work
 
 | Area | Status |
@@ -77,7 +85,7 @@ Historical decisions and checks remain in `logs/log-rev000.log` through 007.
 | Selling | POS transactions are excluded by the current scope. Catalog/search/filter only; no cart, checkout, payment, receipt creation or sale stock deduction. |
 | History | Displays persisted/imported receipts; no manual receipt creation. |
 | Vendors | Management implemented. Vendor payments, settlement, purchase orders and receiving remain undefined/pending. |
-| Reports | Pending. |
+| Reports | Current inventory and recorded stock movements implemented. Historical stock balances, cost/profit, receiving summaries, physical-count variance and export remain pending. POS/sales reports excluded from current scope. |
 | Stock workflows | Physical counts, variance approval, receiving and adjustments pending. |
 | Product lifecycle | No delete/archive, barcode scan, images, variants or bulk import. |
 | Staff accounts | Google identity binds workbook access; staff roles/permissions are pending. |
@@ -105,6 +113,8 @@ Google Cloud registration, official references and device acceptance steps.
 
 ## Verification
 
-Keep iteration lean: twenty focused checks covering existing data flows, worksheet inspection,
-sync presentation, launch-based greeting rotation and vendor lifecycle rules. No maintained screenshot baselines, layout assertions or device matrix.
-Build/lint/regression results for this revision are recorded in log-rev007.
+Keep iteration lean: twenty-two focused checks covering existing data flows, worksheet inspection,
+sync presentation, launch-based greeting rotation, vendor lifecycle rules and
+inventory-report calculations. No maintained screenshot baselines, layout
+assertions or device matrix.
+Build/lint/regression results for this revision are recorded in log-rev008.

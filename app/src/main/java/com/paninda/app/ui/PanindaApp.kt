@@ -19,6 +19,7 @@ import com.paninda.app.domain.model.*
 import com.paninda.app.ui.home.HomeScreen
 import com.paninda.app.ui.sell.SellScreen
 import com.paninda.app.ui.vendors.*
+import com.paninda.app.ui.reports.*
 import com.paninda.app.ui.inventory.*
 import com.paninda.app.ui.history.*
 import com.paninda.app.ui.tools.ToolsScreen
@@ -129,7 +130,14 @@ private fun ConnectedApp(vm: ShopViewModel, state: ShopState, resolveGoogle: Res
                     onProduct = { nav.navigate("product/" + Uri.encode(it)) })
             }
             composable("history") { HistoryScreen(state.transactions) { nav.navigate("transaction/" + Uri.encode(it)) } }
-            composable("tools") { ToolsScreen({ nav.navigate("vendors") }, { nav.navigate("sync") }, { nav.navigate("settings") }, ::message) }
+            composable("tools") { ToolsScreen({ nav.navigate("reports") }, { nav.navigate("vendors") }, { nav.navigate("sync") }, { nav.navigate("settings") }, ::message) }
+            composable("reports") {
+                InventoryReportsScreen(state, { nav.popBackStack() }, { nav.navigate("reports/movements") },
+                    { nav.navigate("product/" + Uri.encode(it)) })
+            }
+            composable("reports/movements") {
+                StockMovementReportScreen(state, { nav.popBackStack() }, { nav.navigate("product/" + Uri.encode(it)) })
+            }
             composable("sync") {
                 SyncStatusScreen(state, { nav.popBackStack() }, vm.cloudBusy) { cloudAction() }
             }

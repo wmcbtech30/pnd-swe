@@ -27,6 +27,8 @@ interface ShopDao {
     @Query("SELECT * FROM transaction_items WHERE transactionId = :id ORDER BY rowid")
     suspend fun items(id: String): List<TransactionItemEntity>
     @Query("SELECT * FROM transaction_items ORDER BY rowid") suspend fun allItems(): List<TransactionItemEntity>
+    @Query("SELECT * FROM stock_movements ORDER BY occurredAt DESC, id")
+    fun observeMovements(): Flow<List<StockMovementEntity>>
     @Query("SELECT * FROM stock_movements ORDER BY occurredAt DESC") suspend fun movements(): List<StockMovementEntity>
     @Query("SELECT * FROM stock_movements WHERE productId = :id ORDER BY occurredAt DESC")
     suspend fun productMovements(id: String): List<StockMovementEntity>

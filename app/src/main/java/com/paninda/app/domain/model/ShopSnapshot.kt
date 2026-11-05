@@ -21,4 +21,5 @@ data class ShopState(
     val syncStatus: String = "idle",
     val networkStatus: NetworkStatus = NetworkStatus.UNKNOWN,
     val vendors: List<Vendor> = emptyList(),
+    val movements: List<StockMovement> = emptyList(),
 )
