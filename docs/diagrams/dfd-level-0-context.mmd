@@ -1,0 +1,32 @@
+%% Paninda — Level 0 DFD (Context Diagram)
+%% Purpose: editable source/specification for visualizing the implemented system.
+%% AI AGENT INSTRUCTIONS:
+%% - If asked to visualize in draw.io, use its connector and read its reference first.
+%% - Draw Staff, Sheets and Google as plain, square-cornered external-entity rectangles.
+%% - Draw Paninda as ONE circular process numbered 0 (equal width/height in draw.io).
+%% - All descriptions between arrow delimiters are connector labels, NEVER extra boxes.
+%% - Use separate directed connectors for input and output. Preserve arrow directions.
+%% - Do not add internal processes, databases, Room, or device preferences at Level 0.
+%% - Do not add receiving, payment processing, staff roles, or other pending features.
+%% - Keep the external data flows balanced with dfd-level-1.mmd.
+%% - Export as SVG for a paper; avoid overlapping labels, nodes and connectors.
+
+flowchart LR
+    Staff["Store Staff"]
+    Sheets["Google Sheets"]
+    Google["Google Authorization Service"]
+    Paninda(("0. Paninda Inventory<br/>Management System"))
+
+    Staff -->|"Product and vendor details;<br/>completed-sale entries;<br/>physical counts and confirmations;<br/>connection and workbook details;<br/>report and sync requests;<br/>notification preferences"| Paninda
+    Paninda -->|"Inventory information;<br/>sale and count records;<br/>reports and stock alerts;<br/>validation and sync status"| Staff
+
+    Paninda -->|"Workbook read requests;<br/>business records for upload"| Sheets
+    Sheets -->|"Workbook records;<br/>operation results"| Paninda
+
+    Paninda -->|"Authorization request"| Google
+    Google -->|"Authorization result;<br/>access token"| Paninda
+
+    classDef entity fill:#ffffff,stroke:#333333,color:#222222,stroke-width:1.5px;
+    classDef process fill:#ffffff,stroke:#333333,color:#222222,stroke-width:1.5px;
+    class Staff,Sheets,Google entity;
+    class Paninda process;

@@ -1,0 +1,80 @@
+%% Paninda — Level 1 Data Flow Diagram
+%% This decomposes process 0 in dfd-level-0-context.mmd into SIX processes.
+%% AI AGENT INSTRUCTIONS:
+%% - If asked to visualize in draw.io, use its connector and read its reference first.
+%% - External entities Staff, Sheets and Google: plain square-cornered rectangles.
+%% - Processes P1-P6: circles, numbered 1.0-6.0, with action-oriented names.
+%% - D1 and D2: DATA STORES. In draw.io use PARALLEL HORIZONTAL LINES or OPEN-ENDED
+%%   RECTANGLES, as taught in the instructor's DFD slides. Mermaid cylinders below
+%%   are portable placeholders ONLY; do not preserve cylinders in the formal DFD.
+%% - D1 is one logical store for product, vendor, sale, sale-item, stock-count,
+%%   stock-movement and synchronization records (implemented with Room/SQLite).
+%% - D2 is one store for device-only notification preferences/delivery markers.
+%% - You may repeat the Staff or D1 symbol to reduce crossings, as in the draw.io
+%%   draft. Every repeated Staff denotes the SAME entity; every D1 the SAME store.
+%%   Keep the same visible identifiers and add a note explaining the duplicates.
+%% - Arrow descriptions are connector labels, NEVER separate boxes or processes.
+%% - No entity-to-store, store-to-store, or external-entity-to-entity connections.
+%% - Keep external inputs/outputs balanced with Level 0. All Google authorization
+%%   and spreadsheet exchanges go through P5; no direct Google-to-local-store link.
+%% - P2 records completed sales and deducts stock; it does NOT process payments.
+%% - P4 reads records to generate reports; P6 reads stock and writes only D2.
+%% - Do not add receiving, recovery workflows, product archiving, staff roles,
+%%   Firebase, automatic synchronization, or other unimplemented features.
+%% - Use a larger canvas/readable labels rather than shrinking or omitting flows.
+
+flowchart TB
+    Staff["Store Staff"]
+    Sheets["Google Sheets"]
+    Google["Google Authorization Service"]
+
+    P1(("1.0 Manage Products<br/>and Vendors"))
+    P2(("2.0 Record<br/>Completed Sales"))
+    P3(("3.0 Perform<br/>Stock Counts"))
+    P4(("4.0 Generate<br/>Inventory Reports"))
+    P5(("5.0 Synchronize<br/>Workbook Data"))
+    P6(("6.0 Manage<br/>Stock Alerts"))
+
+    D1[("D1: Local Inventory Records")]
+    D2[("D2: Notification Settings<br/>and Delivery Markers")]
+
+    Staff -->|"Product and vendor details"| P1
+    D1 -->|"Existing product and vendor records"| P1
+    P1 -->|"Validated product and vendor records;<br/>opening-stock movements"| D1
+    P1 -->|"Inventory information;<br/>validation and save results"| Staff
+
+    Staff -->|"Completed-sale details"| P2
+    D1 -->|"Current products and stock balances"| P2
+    P2 -->|"Sale and sale-item records;<br/>stock-deduction movements"| D1
+    P2 -->|"Saved sale record;<br/>validation result"| Staff
+
+    Staff -->|"Physical quantities;<br/>recorder, notes and confirmation"| P3
+    D1 -->|"Expected stock and product records"| P3
+    P3 -->|"Count records and item snapshots;<br/>confirmed variance adjustments"| D1
+    P3 -->|"Expected-versus-counted comparison;<br/>saved count or validation result"| Staff
+
+    Staff -->|"Report request and filters"| P4
+    D1 -->|"Product, vendor and stock-movement records"| P4
+    P4 -->|"Inventory summaries;<br/>vendor chart and movement report"| Staff
+
+    Staff -->|"Connection details;<br/>selected workbook and sync request"| P5
+    D1 -->|"Local business records;<br/>synchronization metadata"| P5
+    P5 -->|"Validated imported records;<br/>updated synchronization metadata"| D1
+    P5 -->|"Workbook read requests;<br/>business records for upload"| Sheets
+    Sheets -->|"Workbook records;<br/>operation results"| P5
+    P5 -->|"Authorization request"| Google
+    Google -->|"Authorization result;<br/>access token"| P5
+    P5 -->|"Connection and sync status;<br/>conflict and validation warnings"| Staff
+
+    Staff -->|"Notification preferences"| P6
+    D1 -->|"Active products;<br/>stock quantities and thresholds"| P6
+    D2 -->|"Saved preferences;<br/>previous delivery markers"| P6
+    P6 -->|"Updated preferences;<br/>delivery markers"| D2
+    P6 -->|"Low-stock and out-of-stock alerts;<br/>stock-attention list"| Staff
+
+    classDef entity fill:#ffffff,stroke:#333333,color:#222222,stroke-width:1.5px;
+    classDef process fill:#ffffff,stroke:#333333,color:#222222,stroke-width:1.5px;
+    classDef dataStore fill:#ffffff,stroke:#333333,color:#222222,stroke-width:1.5px;
+    class Staff,Sheets,Google entity;
+    class P1,P2,P3,P4,P5,P6 process;
+    class D1,D2 dataStore;
