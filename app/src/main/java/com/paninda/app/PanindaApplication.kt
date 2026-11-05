@@ -13,7 +13,8 @@ class PanindaApplication : Application() {
             { period -> preferences.getInt(period.name, -1) },
             { period, index -> preferences.edit().putInt(period.name, index).apply() })
     }
+    val network by lazy { com.paninda.app.data.network.NetworkMonitor(this) }
     val database by lazy { PanindaDatabase.create(this) }
     val repository by lazy { ShopRepository(database) }
-    val googleSync by lazy { GoogleWorkbookSync(repository, GoogleAuthorization(this)) }
+    val googleSync by lazy { GoogleWorkbookSync(repository, GoogleAuthorization(this), network::current) }
 }

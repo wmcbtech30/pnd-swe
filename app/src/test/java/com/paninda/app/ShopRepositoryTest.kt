@@ -32,6 +32,17 @@ class ShopRepositoryTest {
         assertEquals(ShopSnapshot(), repository.snapshot())
         assertTrue(db.shopDao().pending().isEmpty())
         repository.saveProduct(null, draft)
+        val lastSuccess = repository.state.first().lastCheckedAt
+        val binding = repository.binding()
+        for (failure in listOf("offline", "unreachable", "access", "failed")) {
+            repository.syncStatus(failure)
+            val state = repository.state.first()
+            assertTrue(state.connected)
+            assertEquals(lastSuccess, state.lastCheckedAt)
+            assertEquals(binding, repository.binding())
+            assertEquals(3, state.pendingCount)
+            assertEquals(1, state.products.size)
+        }
         repository.disconnect()
         assertFalse(repository.state.first().connected)
         assertEquals(1, repository.snapshot().products.size)

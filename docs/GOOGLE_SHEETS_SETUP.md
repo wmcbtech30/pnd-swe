@@ -57,23 +57,29 @@ Use a physical Android device with up-to-date Google Play services, a browser an
    the file contains `Meta (Paninda)`, `Vendors (Paninda)`, `Products (Paninda)`,
    `Sales (Paninda)`, `SaleItems (Paninda)` and `StockMovements (Paninda)`.
    Headers start at A1. No sample records. Retained device records are uploaded.
-3. Select an empty existing file: initialize app worksheets inside it without a
+3. After connection, turn off Wi-Fi/mobile data. The current page and local
+   records must remain available. Sync Status shows an offline X. Tap Sync Now:
+   no Google/onboarding page should open. Create/edit a product locally, restart
+   offline and confirm the saved session/data survive. Restore internet and retry.
+   Deleting the file or removing access should show Sync failed while keeping
+   local work and navigation available.
+4. Select an empty existing file: initialize app worksheets inside it without a
    warning. Select a nonempty existing file missing required app worksheets:
    show the Figma warning **before any mutation**. Proceed adds only missing/
    empty app worksheets; other worksheets and their data remain unchanged.
-4. Select a compliant file: connect directly without a compatibility warning.
+5. Select a compliant file: connect directly without a compatibility warning.
    Invalid existing (Paninda) headers/records fail validation rather than being
    overwritten. A complete valid legacy layout from the previous APK is renamed
    in place with `(Paninda)` suffixes. Earlier APKs expect the old names; use the
    current APK after migration.
-5. Create a product offline, restart, then Sync Now online. Check SKU, minor-unit
+6. Create a product offline, restart, then Sync Now online. Check SKU, minor-unit
    price, vendor and opening movement. Remote-only valid edits should import;
    divergent local/remote edits must stop with Settings conflict suggestions.
-6. Break a required header or remove a required app worksheet: sync must fail
+7. Break a required header or remove a required app worksheet: sync must fail
    without importing/clearing local changes. Repair the file and retry.
-7. Disconnect: verify actual Google revocation, return to onboarding and confirm
+8. Disconnect: verify actual Google revocation, return to onboarding and confirm
    local data/Drive file remain. Offline revocation must report failure.
-8. Reconnect via Google Picker. One selected file ID/account binding is stored
+9. Reconnect via Google Picker. One selected file ID/account binding is stored
    per device. A local reset discards unsynced device records, never the remote
    file. Empty valid app worksheets can receive retained local records safely;
    different nonempty copies without a common baseline require conflict review.
@@ -85,7 +91,13 @@ Sync is explicit via Sync Now/Settings; there is no background worker or polling
 Tokens are obtained on demand from Play services, used in memory, and never
 stored in Room or logged. An expired-token 401 clears the cached token; retry
 requests authorization again. Account subject IDs bind sync to the selected
-Google identity. Access failures preserve local data and pending changes.
+Google identity. Live connectivity is observed through Android's default-network callbacks and
+validated-internet capabilities, independently of the saved file/session binding.
+Offline Sync Now fails before Google authorization, stays inside Sync Status,
+and retains local work. Online 403/404/timeouts show an unavailable-file failure;
+401 shows authorization recovery. Access failures preserve local data, pending
+changes, the file binding and last successful sync time. Reconnecting internet
+updates the displayed status but does not start a background upload; tap Sync Now.
 
 The provider-neutral synchronizer compares canonical snapshot hashes to the
 last completed shared baseline. It downloads remote-only changes, uploads

@@ -8,6 +8,10 @@ import com.paninda.app.domain.model.*
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.getValue
@@ -16,7 +20,8 @@ import androidx.compose.runtime.mutableStateOf
 import com.paninda.app.adapters.sheets.*
 import com.paninda.app.data.sync.*
 
-class ShopViewModel(private val repository: ShopRepository, private val google: () -> GoogleWorkbookSync) : ViewModel() {
+class ShopViewModel(private val repository: ShopRepository, private val google: () -> GoogleWorkbookSync,
+    private val network: Flow<NetworkStatus> = flowOf(NetworkStatus.UNKNOWN)) : ViewModel() {
     var cloudBusy by mutableStateOf(false)
         private set
     private val mutableState = MutableStateFlow(ShopState())
@@ -30,7 +35,9 @@ class ShopViewModel(private val repository: ShopRepository, private val google: 
         loadingJob = viewModelScope.launch {
             try {
                 repository.initialize()
-                repository.state.collect { mutableState.value = it }
+                // Connectivity observation must never make the local database/session unavailable.
+                combine(repository.state, network.catch { emit(NetworkStatus.UNKNOWN) }) { local, internet -> local.copy(networkStatus = internet) }
+                    .collect { mutableState.value = it }
             } catch (e: CancellationException) {
                 throw e
             } catch (_: Exception) {
@@ -48,18 +55,28 @@ class ShopViewModel(private val repository: ShopRepository, private val google: 
     suspend fun connect(selected: SelectedSpreadsheet, allowMissingPages: Boolean, resolve: ResolveGoogleConsent) =
         cloud { google().connect(selected, allowMissingPages, resolve) }
     suspend fun createFile(title: String, resolve: ResolveGoogleConsent) = cloud { google().createFile(title, resolve) }
-    suspend fun sync(resolve: ResolveGoogleConsent) = cloud { google().sync(resolve) }
+    suspend fun sync(resolve: ResolveGoogleConsent) = cloud {
+        try {
+            if (state.value.networkStatus == NetworkStatus.OFFLINE) throw OfflineException()
+            google().sync(resolve)
+        } catch (e: CancellationException) { throw e }
+        catch (e: Exception) {
+            repository.syncStatus(SyncFailures.status(e, state.value.networkStatus))
+            throw e
+        }
+    }
     suspend fun disconnect() = cloud { google().disconnect() }
     suspend fun resetLocalData() { check(!cloudBusy); repository.resetLocalData() }
     suspend fun saveProduct(id: String?, draft: ProductDraft) = repository.saveProduct(id, draft)
     suspend fun items(id: String) = repository.items(id)
     suspend fun movements(id: String) = repository.movements(id)
 
-    class Factory(private val repository: ShopRepository, private val google: () -> GoogleWorkbookSync) : ViewModelProvider.Factory {
+    class Factory(private val repository: ShopRepository, private val google: () -> GoogleWorkbookSync,
+        private val network: Flow<NetworkStatus> = flowOf(NetworkStatus.UNKNOWN)) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             require(modelClass.isAssignableFrom(ShopViewModel::class.java))
             @Suppress("UNCHECKED_CAST")
-            return ShopViewModel(repository, google) as T
+            return ShopViewModel(repository, google, network) as T
         }
     }
 }

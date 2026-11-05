@@ -63,18 +63,22 @@ private fun ConnectedApp(vm: ShopViewModel, state: ShopState, resolveGoogle: Res
     val snackbar = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
-    var cloudFailure by remember { mutableStateOf<Int?>(null) }
-    var retryDisconnect by remember { mutableStateOf(false) }
     fun cloudAction(disconnect: Boolean = false) {
         if (vm.cloudBusy) return
-        retryDisconnect = disconnect
         scope.launch(Dispatchers.Main.immediate) {
             try {
-                cloudFailure = null
                 if (disconnect) vm.disconnect() else vm.sync(resolveGoogle)
                 if (!disconnect) snackbar.showSnackbar(context.getString(R.string.sync_done))
             } catch (e: CancellationException) { throw e }
-            catch (e: Exception) { cloudFailure = connectionError(e) }
+            catch (e: Exception) {
+                if (disconnect) {
+                    snackbar.showSnackbar(context.getString(R.string.sync_disconnect_failed))
+                } else {
+                    // A cloud error belongs in the existing app, never in the onboarding flow.
+                    if (nav.currentDestination?.route != "sync") nav.navigate("sync") { launchSingleTop = true }
+                    snackbar.showSnackbar(context.getString(R.string.sync_retry_notice))
+                }
+            }
         }
     }
     fun message(id: Int) { scope.launch(Dispatchers.Main.immediate) { snackbar.showSnackbar(context.getString(id)) } }
@@ -106,11 +110,6 @@ private fun ConnectedApp(vm: ShopViewModel, state: ShopState, resolveGoogle: Res
             launchSingleTop = true
             restoreState = true
         }
-    }
-    if (cloudFailure != null) {
-        ConnectionNoticeScreen(true, busy = vm.cloudBusy, onStartOver = { cloudFailure = null },
-            onProceed = { cloudAction(retryDisconnect) }, bodyOverride = cloudFailure)
-        return
     }
     Scaffold(containerColor = Palette.White, contentWindowInsets = WindowInsets(0, 0, 0, 0),
         bottomBar = { if (!editor) BottomNavigation(route, ::root) },

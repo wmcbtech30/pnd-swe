@@ -15,8 +15,16 @@
     <string name="sync_conflict">Review changes</string>
     <string name="sync_incompatible">Check file format</string>
     <string name="sync_access">Check Google access</string>
-    <string name="sync_failed">Sync interrupted</string>
+    <string name="sync_failed">Sync failed</string>
     <string name="sync_ready">Ready to sync</string>
     <string name="sync_working">Syncing…</string>
     <string name="sync_done">File sync completed. Newer local edits remain pending.</string>
+    <string name="sync_offline">You’re offline!</string>
+    <string name="sync_offline_body">Keep working on this device. Your file connection and local records are saved. When internet returns, tap Sync Now to send pending changes.</string>
+    <string name="sync_unreachable">Sync failed</string>
+    <string name="sync_unreachable_body">Paninda cannot reach the selected file. It may have been deleted, access may have changed, or Google may be temporarily unavailable. Your local records and pending changes are safe. Check the file and retry sync.</string>
+    <string name="sync_access_body">Google authorization needs attention. Your selected file and local records are still saved. Tap Sync Now to authorize again and retry.</string>
+    <string name="sync_failed_body">Sync could not finish. Your selected file, local records and pending changes are kept. Keep working locally and retry when ready.</string>
+    <string name="sync_retry_notice">Sync did not complete. Local work is preserved; check Sync Status and retry.</string>
+    <string name="sync_disconnect_failed">Google access could not be revoked. Your selected file and local session are still kept. Connect to the internet and retry disconnecting.</string>
 </resources>

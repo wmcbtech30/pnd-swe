@@ -6,6 +6,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.WarningAmber
 import androidx.compose.material.icons.outlined.CheckCircle
+import androidx.compose.material.icons.outlined.HighlightOff
 import androidx.compose.material.icons.outlined.CloudQueue
 import com.paninda.app.domain.model.SyncPhase
 import com.paninda.app.domain.model.syncSummary
@@ -27,9 +28,10 @@ import com.paninda.app.ui.theme.*
 @Composable
 fun SyncStatusScreen(state: ShopState, onBack: () -> Unit, busy: Boolean = false, onCheck: () -> Unit) {
     val summary = state.syncSummary
-    val phase = if (busy) SyncPhase.SYNCING else summary.phase
+    val phase = if (busy && summary.phase != SyncPhase.OFFLINE) SyncPhase.SYNCING else summary.phase
     val icon = when (phase) {
         SyncPhase.SYNCED -> Icons.Outlined.CheckCircle
+        SyncPhase.OFFLINE, SyncPhase.UNREACHABLE, SyncPhase.FAILED -> Icons.Outlined.HighlightOff
         SyncPhase.PENDING, SyncPhase.SYNCING -> Icons.Outlined.Sync
         SyncPhase.READY -> Icons.Outlined.CloudQueue
         else -> Icons.Outlined.WarningAmber
@@ -42,7 +44,7 @@ fun SyncStatusScreen(state: ShopState, onBack: () -> Unit, busy: Boolean = false
             Text(syncStatusText(phase), fontFamily = AppFonts.Serif,
                 fontStyle = FontStyle.Italic, fontSize = 40.sp, lineHeight = 60.sp)
             Spacer(Modifier.height(8.dp))
-            Text(stringResource(R.string.sync_explanation), fontFamily = AppFonts.Condensed, fontSize = 20.sp)
+            Text(syncExplanation(phase), fontFamily = AppFonts.Condensed, fontSize = 20.sp)
             Text(state.workbookName.orEmpty(), fontFamily = AppFonts.Condensed, fontSize = 20.sp)
             Text(state.accountEmail.orEmpty(), fontFamily = AppFonts.Condensed, fontSize = 20.sp)
             Text(lastSyncText(summary),

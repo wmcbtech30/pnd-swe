@@ -1,10 +1,16 @@
 package com.paninda.app
 
 import androidx.compose.ui.test.*
+import android.net.ConnectivityManager
+import org.robolectric.shadows.ShadowNetwork
+import org.robolectric.shadows.ShadowNetworkCapabilities
+import android.net.NetworkCapabilities
+import org.robolectric.Shadows
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.semantics.SemanticsActions
 import com.paninda.app.domain.model.ShopSnapshot
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.flow.first
 import org.junit.After
 import org.junit.Rule
 import org.junit.Test
@@ -35,6 +41,28 @@ class PrototypeUiTest {
         compose.onNodeWithText("Search receipt number").assertDoesNotExist()
         compose.onNodeWithContentDescription("History").performClick()
         awaitText("Search receipt number")
+        compose.onNodeWithContentDescription("Home").performClick()
+        awaitHome()
+        compose.onNodeWithContentDescription("Check sync status").performClick()
+        val manager = compose.activity.getSystemService(ConnectivityManager::class.java)
+        val callbacks = Shadows.shadowOf(manager).networkCallbacks.toList()
+        val network = ShadowNetwork.newInstance(404)
+        val capabilities = ShadowNetworkCapabilities.newInstance()
+        Shadows.shadowOf(capabilities).addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+        Shadows.shadowOf(capabilities).addCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
+        compose.runOnIdle {
+            callbacks.forEach {
+                it.onAvailable(network)
+                it.onCapabilitiesChanged(network, capabilities)
+            }
+        }
+        awaitText("File synced")
+        compose.runOnIdle { callbacks.forEach { it.onLost(network) } }
+        awaitText("You’re offline!")
+        compose.onNodeWithText("Sync Now").performScrollTo().performClick()
+        awaitText("Sync did not complete. Local work is preserved; check Sync Status and retry.")
+        compose.onNodeWithText("Choose a data source to get started").assertDoesNotExist()
+        assertTrue(runBlocking { repo.state.first().connected })
         compose.onNodeWithContentDescription("Home").performClick()
         awaitHome()
         compose.onNodeWithContentDescription("Inventory").performClick()

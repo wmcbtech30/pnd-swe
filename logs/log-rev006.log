@@ -1,0 +1,69 @@
+Paninda revision 006 — offline session retention and unreachable-file status
+Date: 2026-11-05 (UTC)
+Branch: litmus_2
+Base: 55d4986
+
+REQUEST / ROOT CAUSE
+Internet loss must preserve offline work and show an offline X on Sync Status.
+An inaccessible workbook must show sync failure, not send the user to onboarding.
+The prior connected-app error path displayed ConnectionNoticeScreen and hid the
+normal app/navigation after sync errors. That onboarding-style screen was wrong
+for an already-connected local session; repository binding writes were separate.
+
+IMPLEMENTED
+- Removed the connected app's full-screen onboarding-style cloud error path.
+  Sync failure opens/stays on the normal Sync Status route with bottom navigation
+  and a brief snackbar. Disconnect failure stays in the app and reports that the
+  grant/session were not removed. Initial setup errors retain their setup screen.
+- Added domain NetworkStatus and data/network/NetworkMonitor. Android default-
+  network callbacks observe validated internet separately from the persisted
+  Google/file binding. Wi-Fi without validated internet is treated as offline.
+  Register before sampling initial state; unregister when observation ends.
+  API 24–25 have an asynchronous capability-sampling compatibility fallback.
+- ViewModel combines Room state with live network status. Internet loss never
+  changes the saved connection flag, file ID/account, outbox or business records.
+  The user can stay on any page and continue local work while offline.
+- Shared sync getter adds OFFLINE and UNREACHABLE phases. Offline has precedence
+  over an old success/busy label; lastSuccessfulAt remains unchanged. Returning
+  online after a failed offline attempt shows Ready/Pending until a successful
+  manual retry. Existing manual-sync behavior is retained; no background worker.
+- Offline Sync Now fails before Google authorization/client resolution. Failures
+  are classified independently: no internet, inaccessible file (403/404), network
+  timeout/server transport failure, expired authorization, conflict and format.
+  Failed requests update status only and preserve session/data/pending changes.
+- Unreachable/deleted/permission-denied file: Sync failed with an X and a useful
+  explanation/retry. Authorization errors offer retry/re-authorization inside the
+  app. Conflict/contract issues continue to show their existing guidance.
+- Figma 19:305 supplies the Sync Status layout, serif status headline, condensed
+  body and Sync Now card. Existing Material components/palette reused. The user's
+  explicit offline X overrides the reference's warning triangle. Successful sync
+  still uses the checkmark from revision 005. Home keeps its last-sync subtitle.
+- First-time connection still needs internet. Only successful explicit Settings
+  disconnect/revocation returns an established session to onboarding.
+
+VERIFICATION
+- Extended the existing behavior smoke check: validated internet/synced status,
+  connection lost/offline X, Sync Now without onboarding, then Home/Inventory and
+  local product creation/persistence. This exercises production network callbacks
+  and the real offline preflight without Google/network calls.
+- Existing repository check now verifies offline/unreachable/access/failed states
+  retain the binding, last success, local products and pending changes before an
+  explicit disconnect. Extended getter coverage and added one failure-policy test.
+- No maintained layout tests, screenshot baselines or device matrix added.
+  Temporary ignored renders inspect only the requested Sync Status component.
+- Build/test/lint and render inspection outcomes are appended after completion.
+- Physical device Wi-Fi/mobile transitions and real Google file-access failures
+  still need acceptance on the user's device; no live-device claim is made.
+
+FINAL CHECKS
+- assembleDebug + lintDebug succeeded. Android lint: 0 errors.
+- All 19 maintained regression checks passed (0 failures/errors). The expanded
+  behavior smoke check proves Sync Now offline stays in the app and still allows
+  local product creation, navigation and persistence through activity recreation.
+- Temporary render inspection passed for offline X, unreachable-file X and success
+  checkmark states. Existing metadata/pending rows remain; no unrelated layout
+  changes were made. The render harness/images stay ignored under work/.
+- Network-monitor observation failures fall back to Unknown rather than breaking
+  Room loading or closing the saved local session.
+- APK: app/build/outputs/apk/debug/app-debug.apk. No remote Git push or Drive
+  upload requested in this correction turn; changes are committed locally.

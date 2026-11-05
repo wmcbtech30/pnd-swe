@@ -1,7 +1,7 @@
 # Prototype status
 
 Branch: `litmus_2`, continuing the clean local-first prototype on `litmus_1`.
-Historical decisions and checks remain in `logs/log-rev000.log` through 005.
+Historical decisions and checks remain in `logs/log-rev000.log` through 006.
 
 ## Implemented
 
@@ -46,6 +46,15 @@ Historical decisions and checks remain in `logs/log-rev000.log` through 005.
   mode. Dark status/navigation controls remain visible against the light app;
   older Android versions without dark navigation icons use a dark fallback bar.
 
+- Live validated-internet status is observed separately from the saved local
+  session/file binding. Losing internet shows Offline with an X and leaves the
+  current page and local work available. Failed sync routes to the normal Sync
+  Status page, preserving bottom navigation; it never opens onboarding.
+- Missing/deleted/inaccessible files and reachable-internet transport failures
+  show Sync failed with a retry explanation. They retain the selected file,
+  local records, pending changes and last successful sync. Only a successful
+  explicit Settings disconnect closes the local session.
+
 ## Operational limits and pending work
 
 | Area | Status |
@@ -87,6 +96,6 @@ Google Cloud registration, official references and device acceptance steps.
 
 ## Verification
 
-Keep iteration lean: eighteen focused checks covering existing data flows, worksheet inspection,
+Keep iteration lean: nineteen focused checks covering existing data flows, worksheet inspection,
 sync presentation and launch-based greeting rotation. No maintained screenshot baselines, layout assertions or device matrix.
-Build/lint/regression results for this revision are recorded in log-rev005.
+Build/lint/regression results for this revision are recorded in log-rev006.

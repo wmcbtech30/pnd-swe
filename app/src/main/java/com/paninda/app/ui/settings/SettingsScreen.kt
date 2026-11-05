@@ -32,7 +32,7 @@ fun SettingsScreen(state: ShopState, busy: Boolean, onBack: () -> Unit, onSync: 
             Spacer(Modifier.height(8.dp))
             Text(state.workbookName.orEmpty())
             Text(state.accountEmail.orEmpty(), style = MaterialTheme.typography.bodyMedium)
-            Text(syncStatusText(if (busy) SyncPhase.SYNCING else state.syncSummary.phase), Modifier.padding(top = 8.dp), style = MaterialTheme.typography.bodyMedium)
+            Text(syncStatusText(if (busy && state.syncSummary.phase != SyncPhase.OFFLINE) SyncPhase.SYNCING else state.syncSummary.phase), Modifier.padding(top = 8.dp), style = MaterialTheme.typography.bodyMedium)
             Spacer(Modifier.height(8.dp))
             MenuRow(stringResource(if (busy) R.string.settings_sync_busy else R.string.settings_sync), Icons.Outlined.Sync, !busy, onSync)
             Spacer(Modifier.height(24.dp))
