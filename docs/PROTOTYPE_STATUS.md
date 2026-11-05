@@ -1,7 +1,7 @@
 # Prototype status
 
-Branch: `litmus_3`, continuing the local-first prototype from `litmus_2`.
-Historical decisions and checks remain in `logs/log-rev000.log` through 011.
+Branch: `litmus_4`, continuing the local-first prototype from `litmus_3`.
+Historical decisions and checks remain in `logs/log-rev000.log` through 012.
 
 ## Implemented
 
@@ -89,6 +89,15 @@ Historical decisions and checks remain in `logs/log-rev000.log` through 011.
 - Sync Status uses Roboto for the explanation, a divider before connection
   metadata, and IBM Plex Sans for the file name, email, last sync and change count.
 
+- Local stock notifications after committed product/sale/count/manual-sync
+  changes, with persistent delivery markers and recovery-based rearming. One
+  summary notification avoids bulk-import noise; updates remain quiet until a
+  new stock-risk event. Uses the launcher bag as a monochrome small icon.
+- Android 13+ contextual permission flow, app toggle/channel controls in Settings,
+  and Tools → Stock Alerts (All/Low/Out/search). Notification taps open that list.
+  No Firebase, notification polling or automatic sync. Details/device acceptance
+  are in `LOW_STOCK_NOTIFICATIONS.md`; workbook schemas remain unchanged.
+
 ## Operational limits and pending work
 
 | Area | Status |
@@ -132,8 +141,9 @@ Google Cloud registration, official references and device acceptance steps.
 
 ## Verification
 
-Keep iteration lean: twenty-five focused checks covering existing data flows, worksheet inspection,
+Keep iteration lean: twenty-eight focused checks covering existing data flows, worksheet inspection,
 sync presentation, launch-based greeting rotation, vendor lifecycle rules and
-inventory-report calculations and atomic sale/count recording. No maintained screenshot baselines, layout
+inventory-report calculations, atomic sale/count recording and local stock-alert
+rules/delivery. No maintained screenshot baselines, layout
 assertions or device matrix.
-Build/lint/regression results for this revision are recorded in log-rev011.
+Build/lint/regression results for this revision are recorded in log-rev012.

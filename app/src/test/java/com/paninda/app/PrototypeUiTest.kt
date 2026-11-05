@@ -148,6 +148,20 @@ class PrototypeUiTest {
         awaitText("Count details")
         compose.onNodeWithContentDescription("Home").performClick()
         awaitHome()
+        compose.runOnIdle {
+            val intent = android.content.Intent(compose.activity.intent)
+                .putExtra(com.paninda.app.data.notifications.StockNotificationPublisher.OPEN_ALERTS, true)
+            // Dispatch the protected Android callback without widening the activity's API for tests.
+            MainActivity::class.java.getDeclaredMethod("onNewIntent", android.content.Intent::class.java)
+                .apply { isAccessible = true }.invoke(compose.activity, intent)
+        }
+        awaitText("Stock Alerts")
+        awaitText("No low-stock or out-of-stock products.")
+        compose.onNodeWithContentDescription("Home").performClick()
+        awaitHome()
+        compose.activityRule.scenario.recreate()
+        awaitHome()
+        compose.onNodeWithText("Stock Alerts").assertDoesNotExist()
         settings()
         compose.onNodeWithText("Reset local data").performScrollTo().performClick()
         compose.onNodeWithText("Delete local data").performClick()

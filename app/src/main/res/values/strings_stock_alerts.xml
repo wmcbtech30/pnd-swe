@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="stock_alerts_title">Stock Alerts</string>
+    <string name="stock_alerts_search">Search product name or SKU</string>
+    <string name="stock_alerts_empty">No low-stock or out-of-stock products.</string>
+</resources>

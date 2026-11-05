@@ -27,6 +27,7 @@ import com.paninda.app.ui.history.*
 import com.paninda.app.ui.tools.ToolsScreen
 import com.paninda.app.ui.sync.SyncStatusScreen
 import com.paninda.app.ui.settings.SettingsScreen
+import com.paninda.app.ui.notifications.*
 import com.paninda.app.ui.navigation.BottomNavigation
 import com.paninda.app.ui.connection.*
 import com.paninda.app.data.sync.ResolveGoogleConsent
@@ -36,7 +37,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @Composable
-fun PanindaApp(vm: ShopViewModel) {
+fun PanindaApp(vm: ShopViewModel, openStockAlerts: Boolean = false, onStockAlertsOpened: () -> Unit = {}) {
     val state by vm.state.collectAsStateWithLifecycle()
     val resolveGoogle = rememberGoogleConsent()
     when {
@@ -54,13 +55,21 @@ fun PanindaApp(vm: ShopViewModel) {
             }
         }
         !state.connected -> ConnectionFlow(vm, resolveGoogle)
-        else -> ConnectedApp(vm, state, resolveGoogle)
+        else -> ConnectedApp(vm, state, resolveGoogle, openStockAlerts, onStockAlertsOpened)
     }
 }
 
 @Composable
-private fun ConnectedApp(vm: ShopViewModel, state: ShopState, resolveGoogle: ResolveGoogleConsent) {
+private fun ConnectedApp(vm: ShopViewModel, state: ShopState, resolveGoogle: ResolveGoogleConsent,
+    openStockAlerts: Boolean, onStockAlertsOpened: () -> Unit) {
     val nav = rememberNavController()
+    val stockNotificationControls = rememberStockNotificationControls(state)
+    LaunchedEffect(openStockAlerts) {
+        if (openStockAlerts) {
+            nav.navigate("stock-alerts") { launchSingleTop = true }
+            onStockAlertsOpened()
+        }
+    }
     val entry by nav.currentBackStackEntryAsState()
     val route = entry?.destination?.route.orEmpty().ifEmpty { "home" }
     val editor = route.startsWith("product/new") || route == "vendor/new" || route.startsWith("sale/new") || route == "counts/new" || route.endsWith("/edit")
@@ -146,7 +155,9 @@ private fun ConnectedApp(vm: ShopViewModel, state: ShopState, resolveGoogle: Res
                     onProduct = { nav.navigate("product/" + Uri.encode(it)) })
             }
             composable("history") { HistoryScreen(state.transactions) { nav.navigate("transaction/" + Uri.encode(it)) } }
-            composable("tools") { ToolsScreen({ nav.navigate("counts") }, { nav.navigate("reports") }, { nav.navigate("vendors") }, { nav.navigate("sync") }, { nav.navigate("settings") }) }
+            composable("tools") { ToolsScreen({ nav.navigate("stock-alerts") }, { nav.navigate("counts") }, { nav.navigate("reports") }, { nav.navigate("vendors") }, { nav.navigate("sync") }, { nav.navigate("settings") }) }
+            composable("stock-alerts") { StockAlertsScreen(state.products, { nav.popBackStack() },
+                { nav.navigate("product/" + Uri.encode(it)) }) }
             composable("reports") {
                 InventoryReportsScreen(state, { nav.popBackStack() }, { nav.navigate("reports/movements") },
                     { nav.navigate("product/" + Uri.encode(it)) })
@@ -167,7 +178,7 @@ private fun ConnectedApp(vm: ShopViewModel, state: ShopState, resolveGoogle: Res
                         }
                         snackbar.showSnackbar(context.getString(R.string.settings_reset_done))
                     }
-                })
+                }, notificationContent = { StockNotificationSettings(stockNotificationControls) })
             }
             composable("product/new?vendor={vendor}", arguments = listOf(navArgument("vendor") { defaultValue = "" })) { backStack ->
                 NewProductScreen(state.products, vm, { nav.popBackStack() }, backStack.arguments?.getString("vendor")?.takeIf { it.isNotEmpty() })

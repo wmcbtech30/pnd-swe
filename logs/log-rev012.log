@@ -1,0 +1,64 @@
+Paninda revision 012 — local low-stock notifications
+Date: 2026-11-05 (UTC)
+Branch: litmus_4
+Base: 32f37fe (litmus_3)
+
+REQUEST
+Create litmus_4 and implement low-stock notifications locally, using the app icon
+in monochrome for notification icons. Firebase is unnecessary for local changes.
+
+IMPLEMENTED
+- StockAlertRules classifies healthy/low/out active products. Device-only delivery
+  markers persist across restarts: warn once while low, escalate at zero, rearm
+  out warnings after positive recovery and low warnings above threshold. Removed/
+  inactive products drop out. Blocked delivery never marks an alert delivered.
+- Separate notification observer reads product/connection data in a Room
+  transaction after invalidation, including product edits, sales, counts and
+  sync imports. Startup evaluates saved local state. No Google call or polling.
+- One summary notification lists up to five current stock risks and counts the
+  rest. New threshold events alert; existing notification updates are silent.
+  Dismissed alerts stay dismissed until a new event. Recovery, reset, disconnect,
+  permission/channel blocking and user disabling cancel stale notifications.
+- Stock alerts channel, POST_NOTIFICATIONS permission and Android 13+ contextual
+  explanation/request. Not now/denial do not block local work. Settings adds app
+  toggle and Android channel controls; permission state refreshes on resume.
+- Transparent monochrome notification vector reuses the existing launcher bag
+  geometry, without the launcher's blue square. All stock notifications use it.
+- Tools → Stock Alerts shows low/out products with filters/search and links to
+  product details. Separate Kotlin page/strings. Notification immutable intent
+  opens the same page on warm/cold activity launch. Session gate remains intact;
+  consuming the request prevents it reopening after navigating away/recreation.
+- Local-first/manual-sync behavior retained. Delivery preferences/markers are
+  not business records, workbook columns or pending sync data. No database or
+  workbook schema changes, upgrades or compatibility code. No production fixtures.
+- Added LOW_STOCK_NOTIFICATIONS.md and updated prototype status. Firebase,
+  automatic sync, remote push and scheduling remain out of scope.
+
+VERIFICATION
+Results appended after completion. Three focused maintained checks cover threshold
+rules, Android permission/channel/icon/tap publishing, and repository-driven
+sale/count/sync/settings delivery/deduplication. Existing behavior smoke extended
+for notification-route handling and consumption. No maintained layout tests.
+Initial test compilation caught protected-callback dispatch and application-cast
+issues in the test harness; corrected without widening production API visibility.
+
+FINAL CHECKS
+- All 28 maintained checks passed, zero failures/errors. Notification checks
+  prove low/out rearming, unchanged-stock deduplication, persistence after observer
+  restart, blocked delivery retained for later enable, sales/counts/sync imports,
+  disabled settings, disconnect/reset cleanup, permission gating, channel setup,
+  immutable tap intent and the monochrome icon resource.
+- Existing behavior smoke passed with notification-intent navigation to Stock
+  Alerts, return Home and activity recreation without reopening the alert route.
+  The simulation preserves ActivityScenario's launch-intent identity; production
+  navigation remains a protected Android callback behind the normal session gate.
+- Inspected two ignored temporary renders for the Stock Alerts page, Settings
+  controls and launcher/monochrome glyph comparison. No maintained layout suite,
+  screenshot baselines or production fixtures added.
+- Final assembleDebug and lintDebug passed; lint reports zero errors.
+- APK: app/build/outputs/apk/debug/app-debug.apk.
+- Physical-device notification drawer, OEM sound/DND, permission-dialog behavior
+  and cold-start acceptance remain in docs/LOW_STOCK_NOTIFICATIONS.md. No live
+  device/Google acceptance claim is made by the local checks.
+- Room/eight-worksheet contracts unchanged; no migrations or compatibility work.
+- Changes committed locally on litmus_4. No GitHub push or Drive upload requested.

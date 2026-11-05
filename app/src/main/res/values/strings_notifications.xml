@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="alert_channel_name">Stock alerts</string>
+    <string name="alert_channel_description">Local alerts when active products run low or run out.</string>
+    <plurals name="alert_title"><item quantity="one">%d product needs stock attention</item><item quantity="other">%d products need stock attention</item></plurals>
+    <string name="alert_low_line">%1$s: %2$d remaining (low stock)</string>
+    <string name="alert_out_line">%1$s: out of stock (balance %2$d)</string>
+    <string name="alert_summary">%1$d low stock · %2$d out of stock</string>
+    <string name="alert_more">And %1$d more products</string>
+    <string name="alert_permission_title">Get stock alerts?</string>
+    <string name="alert_permission_body">Get a notification when products run low or run out. Alerts work with stock saved on this device, even offline. You can change this in Settings.</string>
+    <string name="alert_enable">Enable notifications</string>
+    <string name="alert_not_now">Not now</string>
+    <string name="alert_settings_heading">NOTIFICATIONS</string>
+    <string name="alert_settings_toggle">Low-stock notifications</string>
+    <string name="alert_settings_on">On. Alerts use this device’s inventory. Stock recovery allows new alerts; repeated changes while still low update quietly.</string>
+    <string name="alert_settings_off">Off. You can still check Stock Alerts under Tools.</string>
+    <string name="alert_settings_blocked">Android notification permission or the Stock alerts channel is off. Enable it to receive alerts.</string>
+    <string name="alert_android_settings">Android notification settings</string>
+</resources>

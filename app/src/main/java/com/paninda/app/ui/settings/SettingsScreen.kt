@@ -23,7 +23,7 @@ import com.paninda.app.ui.sync.syncStatusText
 
 @Composable
 fun SettingsScreen(state: ShopState, busy: Boolean, onBack: () -> Unit, onSync: () -> Unit,
-    onDisconnect: () -> Unit, onReset: () -> Unit) {
+    onDisconnect: () -> Unit, onReset: () -> Unit, notificationContent: @Composable () -> Unit = {}) {
     var dialog by rememberSaveable { mutableStateOf("") }
     PageScaffold(stringResource(R.string.settings_title), onBack = onBack) { padding ->
         Column(Modifier.fillMaxSize().padding(padding).verticalScroll(rememberScrollState())
@@ -44,6 +44,8 @@ fun SettingsScreen(state: ShopState, busy: Boolean, onBack: () -> Unit, onSync: 
                     else if (state.syncStatus == "incompatible") R.string.settings_contract_detected
                     else R.string.settings_conflict_guidance), Modifier.padding(14.dp), style = MaterialTheme.typography.bodyMedium)
             }
+            Spacer(Modifier.height(24.dp))
+            notificationContent()
             Spacer(Modifier.height(24.dp))
             SectionLabel(stringResource(R.string.settings_manage))
             Spacer(Modifier.height(8.dp))
