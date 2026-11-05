@@ -1,0 +1,68 @@
+PANINDA - UI AND NAVIGATION REVISION 002
+Branch: litmus_1
+Baseline: 6055581 - Implement clean local-first prototype
+Latest implementation commit: 63d9984
+
+1. MENU ICONS
+
+Commit: ed4daea - Fill tool and settings menu icon slots
+
+Filled the reserved leading icon slots with Material outlined icons:
+  Tools > Vendors: Storefront
+  Tools > Stock Counts: FactCheck
+  Tools > Reports: BarChart
+  Tools > Sync Status: Sync
+  Tools > Settings: Settings
+  Settings > Disconnect Workbook: LinkOff
+  Settings > Reset local data: DeleteOutline
+  Sync Status > Sync Now: Sync
+
+The shared MenuRow now accepts an icon. Icons use the existing palette and
+occupy the reserved space while preserving the original label indentation.
+Labels can wrap on narrow screens. Existing actions and pending-feature
+behavior are unchanged. Debug APK build passed.
+
+2. HOME NAVIGATION FIX
+
+Commit: 63d9984 - Return Home navigation directly to dashboard
+
+Reported behavior: after opening History from Home through View all, tapping
+the Home navigation item could restore History instead of the dashboard.
+
+Cause: the shared root-navigation handler used restoreState for Home and could
+restore a saved nested stack associated with the dashboard destination.
+
+Fix: Home now returns directly to the existing dashboard root. If that root
+is absent, navigation creates a dashboard destination without restoring a
+saved nested stack. Tapping Home while already on the dashboard is a no-op.
+
+Extended the existing UI behavior smoke check to cover:
+  - Home > View all > History > Home.
+  - Home > History tab > Home.
+
+The targeted behavior check and debug APK build passed. The total regression
+suite remains ten focused checks. No layout tests, screenshot baselines, or
+device-size matrix tests were added.
+
+3. REPOSITORY AND APK STATUS
+
+Implementation commits ed4daea and 63d9984 were pushed to origin/litmus_1.
+
+The latest APK uploaded to Google Drive is:
+  Paninda-litmus_1-ed4daea-debug.apk
+  https://drive.google.com/file/d/1wF6cPvWnQg-Z0aioDWlqJG-o5MFtdRox/view
+
+That uploaded APK includes the menu icons. The APK containing the Home
+navigation fix at 63d9984 was built locally but has not been uploaded to Drive.
+
+4. UNCHANGED SCOPE
+
+The application still starts with an empty database and no preset identity.
+Selling, reports, vendor management, stock counting, receiving/adjustment
+workflows, Google authentication, and cloud synchronization remain pending.
+The Reports page discussion was a design proposal, not an implementation.
+
+Full implementation status: docs/PROTOTYPE_STATUS.md
+Workbook contract: docs/WORKBOOK_SCHEMA.md
+
+Earlier revision logs are preserved as historical records.
