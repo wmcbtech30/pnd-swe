@@ -2,6 +2,7 @@ package com.paninda.app
 
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.semantics.SemanticsActions
 import com.paninda.app.domain.model.ShopSnapshot
 import kotlinx.coroutines.runBlocking
 import org.junit.After
@@ -27,6 +28,15 @@ class PrototypeUiTest {
         awaitText("Choose a data source to get started")
         assertEquals(ShopSnapshot(), runBlocking { repo.snapshot() })
         connect()
+        compose.onNodeWithText("View all").performSemanticsAction(SemanticsActions.OnClick) { it() }
+        awaitText("Search receipt number")
+        compose.onNodeWithContentDescription("Home").performClick()
+        awaitText("OFFLINE · LOCAL STORAGE")
+        compose.onNodeWithText("Search receipt number").assertDoesNotExist()
+        compose.onNodeWithContentDescription("History").performClick()
+        awaitText("Search receipt number")
+        compose.onNodeWithContentDescription("Home").performClick()
+        awaitText("OFFLINE · LOCAL STORAGE")
         compose.onNodeWithContentDescription("Inventory").performClick()
         compose.onNodeWithText("New Product").performClick()
         fill("Product name", "Test Notebook")

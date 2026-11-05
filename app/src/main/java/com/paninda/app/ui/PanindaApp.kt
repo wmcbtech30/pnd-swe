@@ -92,6 +92,17 @@ private fun ConnectedApp(vm: ShopViewModel, state: ShopState) {
         }
     }
     fun root(destination: String) {
+        if (destination == "home") {
+            // Home is the dashboard root, never a saved stack of pages opened from it.
+            if (nav.currentDestination?.route != "home" && !nav.popBackStack("home", inclusive = false)) {
+                nav.navigate("home") {
+                    popUpTo(nav.graph.id)
+                    launchSingleTop = true
+                    restoreState = false
+                }
+            }
+            return
+        }
         val target = if (destination == "inventory") "inventory?stock=ALL" else destination
         nav.navigate(target) {
             popUpTo("home") { saveState = true }

@@ -10,6 +10,8 @@ user's subsequent correction: **start completely clean, without sample data**.
 - Five navigation pillars with shared Material icons and a persistent bottom
   bar. Subpages use a chevron-left back action. Product editing hides the bottom
   bar to prevent accidental navigation away from unsaved changes.
+- Tapping Home returns directly to the dashboard root, including after opening
+  History through View all; it does not restore a saved nested navigation stack.
 - Shared cards corresponding to the inspected Figma component variants.
 - Fixed page headings, search, filter actions, and History summary. Lists and
   forms scroll independently. FABs include icons and lists reserve bottom space.
