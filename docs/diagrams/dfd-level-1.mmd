@@ -8,7 +8,7 @@
 %%   RECTANGLES, as taught in the instructor's DFD slides. Mermaid cylinders below
 %%   are portable placeholders ONLY; do not preserve cylinders in the formal DFD.
 %% - D1 is one logical store for product, vendor, sale, sale-item, stock-count,
-%%   stock-movement and synchronization records (implemented with Room/SQLite).
+%%   stock-count-item, stock-movement, connection, pending-change and synchronization records (implemented with Room/SQLite).
 %% - D2 is one store for device-only notification preferences/delivery markers.
 %% - You may repeat the Staff or D1 symbol to reduce crossings, as in the draw.io
 %%   draft. Every repeated Staff denotes the SAME entity; every D1 the SAME store.
@@ -25,49 +25,49 @@
 
 flowchart TB
     Staff["Store Staff"]
-    Sheets["Google Sheets"]
-    Google["Google Authorization Service"]
+    Sheets["Google Sheets / Drive"]
+    Google["Google Identity / Picker"]
 
     P1(("1.0 Manage Products<br/>and Vendors"))
     P2(("2.0 Record<br/>Completed Sales"))
     P3(("3.0 Perform<br/>Stock Counts"))
     P4(("4.0 Generate<br/>Inventory Reports"))
-    P5(("5.0 Synchronize<br/>Workbook Data"))
+    P5(("5.0 Manage Connection<br/>and Workbook Sync"))
     P6(("6.0 Manage<br/>Stock Alerts"))
 
     D1[("D1: Local Inventory Records")]
     D2[("D2: Notification Settings<br/>and Delivery Markers")]
 
-    Staff -->|"Product and vendor details"| P1
+    Staff -->|"Product and vendor details;<br/>vendor archive / restore selection"| P1
     D1 -->|"Existing product and vendor records"| P1
-    P1 -->|"Validated product and vendor records;<br/>opening-stock movements"| D1
+    P1 -->|"Validated product and vendor records;<br/>opening-stock movements and pending changes"| D1
     P1 -->|"Inventory information;<br/>validation and save results"| Staff
 
     Staff -->|"Completed-sale details"| P2
     D1 -->|"Current products and stock balances"| P2
-    P2 -->|"Sale and sale-item records;<br/>stock-deduction movements"| D1
+    P2 -->|"Sale and sale-item records;<br/>stock-deduction movements;<br/>product versions and pending changes"| D1
     P2 -->|"Saved sale record;<br/>validation result"| Staff
 
     Staff -->|"Physical quantities;<br/>recorder, notes and confirmation"| P3
     D1 -->|"Expected stock and product records"| P3
-    P3 -->|"Count records and item snapshots;<br/>confirmed variance adjustments"| D1
+    P3 -->|"Count records and item snapshots;<br/>confirmed variance adjustments;<br/>product versions and pending changes"| D1
     P3 -->|"Expected-versus-counted comparison;<br/>saved count or validation result"| Staff
 
     Staff -->|"Report request and filters"| P4
     D1 -->|"Product, vendor and stock-movement records"| P4
     P4 -->|"Inventory summaries;<br/>vendor chart and movement report"| Staff
 
-    Staff -->|"Connection details;<br/>selected workbook and sync request"| P5
+    Staff -->|"Connection / workbook creation details;<br/>selected workbook and sync request;<br/>disconnect and confirmed local-reset requests"| P5
     D1 -->|"Local business records;<br/>synchronization metadata"| P5
-    P5 -->|"Validated imported records;<br/>updated synchronization metadata"| D1
-    P5 -->|"Workbook read requests;<br/>business records for upload"| Sheets
-    Sheets -->|"Workbook records;<br/>operation results"| P5
-    P5 -->|"Authorization request"| Google
-    Google -->|"Authorization result;<br/>access token"| P5
+    P5 -->|"Validated imported records;<br/>connection / synchronization metadata;<br/>confirmed local-data reset"| D1
+    P5 -->|"Workbook creation / setup / read requests;<br/>file metadata requests;<br/>business records for upload"| Sheets
+    Sheets -->|"Workbook records and file metadata;<br/>operation results"| P5
+    P5 -->|"Authorization / account / Picker requests;<br/>grant revocation request"| Google
+    Google -->|"Authorization result and access token;<br/>account identity and selected file ID;<br/>revocation result"| P5
     P5 -->|"Connection and sync status;<br/>conflict and validation warnings"| Staff
 
     Staff -->|"Notification preferences"| P6
-    D1 -->|"Active products;<br/>stock quantities and thresholds"| P6
+    D1 -->|"Active products;<br/>stock quantities and thresholds;<br/>connection state"| P6
     D2 -->|"Saved preferences;<br/>previous delivery markers"| P6
     P6 -->|"Updated preferences;<br/>delivery markers"| D2
     P6 -->|"Low-stock and out-of-stock alerts;<br/>stock-attention list"| Staff

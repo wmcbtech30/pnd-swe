@@ -13,18 +13,18 @@
 
 flowchart LR
     Staff["Store Staff"]
-    Sheets["Google Sheets"]
-    Google["Google Authorization Service"]
+    Sheets["Google Sheets / Drive"]
+    Google["Google Identity / Picker"]
     Paninda(("0. Paninda Inventory<br/>Management System"))
 
-    Staff -->|"Product and vendor details;<br/>completed-sale entries;<br/>physical counts and confirmations;<br/>connection and workbook details;<br/>report and sync requests;<br/>notification preferences"| Paninda
+    Staff -->|"Product and vendor details;<br/>completed-sale entries;<br/>physical counts and confirmations;<br/>connection and workbook details;<br/>disconnect and confirmed local-reset requests;<br/>report and sync requests;<br/>notification preferences"| Paninda
     Paninda -->|"Inventory information;<br/>sale and count records;<br/>reports and stock alerts;<br/>validation and sync status"| Staff
 
-    Paninda -->|"Workbook read requests;<br/>business records for upload"| Sheets
-    Sheets -->|"Workbook records;<br/>operation results"| Paninda
+    Paninda -->|"Workbook creation / setup / read requests;<br/>file metadata requests;<br/>business records for upload"| Sheets
+    Sheets -->|"Workbook records and file metadata;<br/>operation results"| Paninda
 
-    Paninda -->|"Authorization request"| Google
-    Google -->|"Authorization result;<br/>access token"| Paninda
+    Paninda -->|"Authorization / account / Picker requests;<br/>grant revocation request"| Google
+    Google -->|"Authorization result and access token;<br/>account identity and selected file ID;<br/>revocation result"| Paninda
 
     classDef entity fill:#ffffff,stroke:#333333,color:#222222,stroke-width:1.5px;
     classDef process fill:#ffffff,stroke:#333333,color:#222222,stroke-width:1.5px;
