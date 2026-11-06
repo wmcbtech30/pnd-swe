@@ -1,0 +1,12 @@
+Paninda revision 014 — welcome-screen application name
+Date: 2026-11-06 (Asia/Manila)
+Branch: litmus_4
+
+REQUEST AND CHANGE
+Changed onboarding_brand from the two-line Repana Store label to Paninda.
+The welcome screen reads this page-specific string resource.
+
+VERIFICATION
+assembleDebug passed and generated app/build/outputs/apk/debug/app-debug.apk.
+git diff --check passed. No additional tests added for this text-only change.
+No database or worksheet contract changes.
