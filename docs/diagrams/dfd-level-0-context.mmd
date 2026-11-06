@@ -7,7 +7,7 @@
 %% - All descriptions between arrow delimiters are connector labels, NEVER extra boxes.
 %% - Use separate directed connectors for input and output. Preserve arrow directions.
 %% - Do not add internal processes, databases, Room, or device preferences at Level 0.
-%% - Do not add receiving, payment processing, staff roles, or other pending features.
+%% - Do not add payment processing, staff roles, or other pending features.
 %% - Keep the external data flows balanced with dfd-level-1.mmd.
 %% - Export as SVG for a paper; avoid overlapping labels, nodes and connectors.
 
@@ -17,8 +17,8 @@ flowchart LR
     Google["Google Identity / Picker"]
     Paninda(("0. Paninda Inventory<br/>Management System"))
 
-    Staff -->|"Product and vendor details;<br/>completed-sale entries;<br/>physical counts and confirmations;<br/>connection and workbook details;<br/>disconnect and confirmed local-reset requests;<br/>report and sync requests;<br/>notification preferences"| Paninda
-    Paninda -->|"Inventory information;<br/>sale and count records;<br/>reports and stock alerts;<br/>validation and sync status"| Staff
+    Staff -->|"Product and vendor details;<br/>completed-sale entries;<br/>physical counts and confirmations;<br/>delivery details and confirmations;<br/>connection and workbook details;<br/>disconnect and confirmed local-reset requests;<br/>report and sync requests;<br/>notification preferences"| Paninda
+    Paninda -->|"Inventory information;<br/>sale, count and delivery records;<br/>reports and stock alerts;<br/>validation and sync status"| Staff
 
     Paninda -->|"Workbook creation / setup / read requests;<br/>file metadata requests;<br/>business records for upload"| Sheets
     Sheets -->|"Workbook records and file metadata;<br/>operation results"| Paninda

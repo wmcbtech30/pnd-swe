@@ -8,6 +8,8 @@ data class ShopSnapshot(
     val movements: List<StockMovement> = emptyList(),
     val counts: List<StockCount> = emptyList(),
     val countItems: List<StockCountItem> = emptyList(),
+    val deliveries: List<StockDelivery> = emptyList(),
+    val deliveryItems: List<StockDeliveryItem> = emptyList(),
 )
 
 data class ShopState(
@@ -25,4 +27,5 @@ data class ShopState(
     val vendors: List<Vendor> = emptyList(),
     val movements: List<StockMovement> = emptyList(),
     val counts: List<StockCount> = emptyList(),
+    val deliveries: List<StockDelivery> = emptyList(),
 )

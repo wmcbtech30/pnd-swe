@@ -1,7 +1,7 @@
 # Prototype status
 
 Branch: `litmus_4`, continuing the local-first prototype from `litmus_3`.
-Historical decisions and checks remain in `logs/log-rev000.log` through 012.
+Historical decisions and checks remain in `logs/log-rev000.log` through 013.
 
 ## Implemented
 
@@ -17,7 +17,7 @@ Historical decisions and checks remain in `logs/log-rev000.log` through 012.
 - Google Play services OAuth authorization with limited `drive.file`, OpenID and
   email scopes. Onboarding cannot bypass real authorization/workbook connection.
 - Onboarding choice between an existing file through Google’s own Picker and
-  creating a named file. Eight `(Paninda)` worksheets live inside that one file.
+  creating a named file. Ten `(Paninda)` worksheets live inside that one file.
   Real Sheets REST read/write remains behind a modular adapter. Core domain models and
   Room repository do not depend on Google transport.
 - Conditional Figma-style warning only when a selected file has cell data and
@@ -89,14 +89,24 @@ Historical decisions and checks remain in `logs/log-rev000.log` through 012.
 - Sync Status uses Roboto for the explanation, a divider before connection
   metadata, and IBM Plex Sans for the file name, email, last sync and change count.
 
-- Local stock notifications after committed product/sale/count/manual-sync
+- Local stock notifications after committed product/sale/count/receiving/manual-sync
   changes, with persistent delivery markers and recovery-based rearming. One
   summary notification avoids bulk-import noise; updates remain quiet until a
   new stock-risk event. Uses the launcher bag as a monochrome small icon.
 - Android 13+ contextual permission flow, app toggle/channel controls in Settings,
   and Tools → Stock Alerts (All/Low/Out/search). Notification taps open that list.
   No Firebase, notification polling or automatic sync. Details/device acceptance
-  are in `LOW_STOCK_NOTIFICATIONS.md`; workbook schemas remain unchanged.
+  are in `LOW_STOCK_NOTIFICATIONS.md`; notification state stays device-only.
+
+- Tools → Management → Stock Receiving: searchable/date-filtered delivery
+  history, vendor-specific incoming-product forms, received date, recorder,
+  optional reference/notes and confirmation. Completed deliveries retain immutable
+  vendor/name/SKU/item snapshots, add RECEIVING stock movements and sync outbox
+  entries atomically. Existing counts become stale after receiving changes stock.
+- Receiving works offline and refreshes inventory/reports/notification recovery.
+  Product selling prices are not changed. Two new StockDeliveries and
+  StockDeliveryItems worksheets preserve delivery history during manual sync.
+- Management rows use one 8dp spacing rule; sections retain 24dp separation.
 
 ## Operational limits and pending work
 
@@ -112,9 +122,9 @@ Historical decisions and checks remain in `logs/log-rev000.log` through 012.
 | Failed creation | Timed-out work may have reached Google; incomplete or duplicate workbooks can remain. The app never automatically deletes them. |
 | Selling | Completed-sale recording implemented with stock deduction. POS/payment processing, checkout, voids/refunds and backdated entry are excluded/not implemented. |
 | History | Displays recorded/imported sales and immutable item/price snapshots. |
-| Vendors | Management implemented. Vendor payments, settlement, purchase orders and receiving remain undefined/pending. |
+| Vendors | Management implemented. Vendor payments, settlement and purchase orders remain undefined/pending. Stock receiving is implemented. |
 | Reports | Current inventory and recorded stock movements implemented. Historical stock balances, cost/profit, receiving summaries, aggregate count-variance analysis and export remain pending. Count details show individual variances. No POS analytics. |
-| Stock workflows | Physical counts, user confirmation, variance history and count adjustments implemented. Receiving, standalone adjustments and role-based count approval remain pending. |
+| Stock workflows | Receiving, physical counts, user confirmation, variance history and count adjustments implemented. Standalone adjustments, receiving edits/returns and role-based count approval remain pending. |
 | Product lifecycle | No delete/archive, barcode scan, images, variants or bulk import. |
 | Staff accounts | Google identity binds workbook access; staff roles/permissions are pending. |
 | Financial workflows | Voids, refunds, discounts, taxes and consignor settlement are undefined. |
@@ -126,7 +136,7 @@ Historical decisions and checks remain in `logs/log-rev000.log` through 012.
 stock ledger and receipt-total rules remain unchanged. The Google adapter requires
 original header order; pure import mapping remains tolerant of reordered headers.
 App state/outbox are device metadata. This branch uses a fresh Room/schema-1
-contract with expanded vendor columns and stock-count tables. Per the requested testing workflow, no
+contract with expanded vendor columns, stock-count and stock-delivery tables. Per the requested testing workflow, no
 schema upgrades, migrations or backward compatibility are provided. Uninstall
 and use a new file or freshly initialized app worksheets when testing this branch.
 
@@ -141,9 +151,9 @@ Google Cloud registration, official references and device acceptance steps.
 
 ## Verification
 
-Keep iteration lean: twenty-eight focused checks covering existing data flows, worksheet inspection,
+Keep iteration lean: thirty focused checks covering existing data flows, worksheet inspection,
 sync presentation, launch-based greeting rotation, vendor lifecycle rules and
-inventory-report calculations, atomic sale/count recording and local stock-alert
+inventory-report calculations, atomic sale/count/receiving recording and local stock-alert
 rules/delivery. No maintained screenshot baselines, layout
 assertions or device matrix.
-Build/lint/regression results for this revision are recorded in log-rev012.
+Build/lint/regression results for this revision are recorded in log-rev013.

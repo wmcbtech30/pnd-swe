@@ -1,14 +1,15 @@
 %% Paninda — Level 1 Data Flow Diagram
-%% This decomposes process 0 in dfd-level-0-context.mmd into SIX processes.
+%% This decomposes process 0 in dfd-level-0-context.mmd into SEVEN processes.
 %% AI AGENT INSTRUCTIONS:
 %% - If asked to visualize in draw.io, use its connector and read its reference first.
 %% - External entities Staff, Sheets and Google: plain square-cornered rectangles.
-%% - Processes P1-P6: circles, numbered 1.0-6.0, with action-oriented names.
+%% - Processes P1-P7: circles, numbered 1.0-7.0, with action-oriented names.
 %% - D1 and D2: DATA STORES. In draw.io use PARALLEL HORIZONTAL LINES or OPEN-ENDED
 %%   RECTANGLES, as taught in the instructor's DFD slides. Mermaid cylinders below
 %%   are portable placeholders ONLY; do not preserve cylinders in the formal DFD.
 %% - D1 is one logical store for product, vendor, sale, sale-item, stock-count,
-%%   stock-count-item, stock-movement, connection, pending-change and synchronization records (implemented with Room/SQLite).
+%%   stock-count-item, stock-movement, stock-delivery, stock-delivery-item,
+%%   connection, pending-change and synchronization records (Room/SQLite).
 %% - D2 is one store for device-only notification preferences/delivery markers.
 %% - You may repeat the Staff or D1 symbol to reduce crossings, as in the draw.io
 %%   draft. Every repeated Staff denotes the SAME entity; every D1 the SAME store.
@@ -19,7 +20,7 @@
 %%   and spreadsheet exchanges go through P5; no direct Google-to-local-store link.
 %% - P2 records completed sales and deducts stock; it does NOT process payments.
 %% - P4 reads records to generate reports; P6 reads stock and writes only D2.
-%% - Do not add receiving, recovery workflows, product archiving, staff roles,
+%% - Do not add recovery workflows, product archiving, staff roles,
 %%   Firebase, automatic synchronization, or other unimplemented features.
 %% - Use a larger canvas/readable labels rather than shrinking or omitting flows.
 
@@ -34,6 +35,8 @@ flowchart TB
     P4(("4.0 Generate<br/>Inventory Reports"))
     P5(("5.0 Manage Connection<br/>and Workbook Sync"))
     P6(("6.0 Manage<br/>Stock Alerts"))
+
+    P7(("7.0 Receive<br/>Stock Deliveries"))
 
     D1[("D1: Local Inventory Records")]
     D2[("D2: Notification Settings<br/>and Delivery Markers")]
@@ -72,9 +75,14 @@ flowchart TB
     P6 -->|"Updated preferences;<br/>delivery markers"| D2
     P6 -->|"Low-stock and out-of-stock alerts;<br/>stock-attention list"| Staff
 
+    Staff -->|"Vendor and received date;<br/>recorder, reference and notes;<br/>product quantities and confirmation"| P7
+    D1 -->|"Current vendor and product records;<br/>stock balances"| P7
+    P7 -->|"Delivery and item snapshots;<br/>receiving movements;<br/>updated product metadata and pending changes"| D1
+    P7 -->|"Saved delivery record;<br/>validation result"| Staff
+
     classDef entity fill:#ffffff,stroke:#333333,color:#222222,stroke-width:1.5px;
     classDef process fill:#ffffff,stroke:#333333,color:#222222,stroke-width:1.5px;
     classDef dataStore fill:#ffffff,stroke:#333333,color:#222222,stroke-width:1.5px;
     class Staff,Sheets,Google entity;
-    class P1,P2,P3,P4,P5,P6 process;
+    class P1,P2,P3,P4,P5,P6,P7 process;
     class D1,D2 dataStore;

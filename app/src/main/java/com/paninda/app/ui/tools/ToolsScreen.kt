@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.LocalShipping
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.BarChart
 import androidx.compose.material.icons.outlined.FactCheck
@@ -18,17 +19,18 @@ import com.paninda.app.R
 import com.paninda.app.ui.components.*
 
 @Composable
-fun ToolsScreen(onAlerts: () -> Unit, onCounts: () -> Unit, onReports: () -> Unit, onVendors: () -> Unit, onSync: () -> Unit, onSettings: () -> Unit) {
+fun ToolsScreen(onReceiving: () -> Unit, onAlerts: () -> Unit, onCounts: () -> Unit, onReports: () -> Unit, onVendors: () -> Unit, onSync: () -> Unit, onSettings: () -> Unit) {
     PageScaffold(stringResource(R.string.common_tools)) { padding ->
         Column(Modifier.fillMaxSize().padding(padding).verticalScroll(rememberScrollState())
             .padding(start = 26.dp, end = 22.dp, top = 12.dp, bottom = 24.dp)) {
             SectionLabel(stringResource(R.string.tools_management))
             Spacer(Modifier.height(8.dp))
-            MenuRow(stringResource(R.string.tools_vendors), Icons.Outlined.Storefront) { onVendors() }
-            Spacer(Modifier.height(8.dp))
-            MenuRow(stringResource(R.string.tools_stock_counts), Icons.Outlined.FactCheck) { onCounts() }
-            Spacer(Modifier.height(24.dp))
-            MenuRow(stringResource(R.string.stock_alerts_title), Icons.Outlined.Notifications, onClick = onAlerts)
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                MenuRow(stringResource(R.string.tools_vendors), Icons.Outlined.Storefront, onClick = onVendors)
+                MenuRow(stringResource(R.string.receiving_title), Icons.Outlined.LocalShipping, onClick = onReceiving)
+                MenuRow(stringResource(R.string.tools_stock_counts), Icons.Outlined.FactCheck, onClick = onCounts)
+                MenuRow(stringResource(R.string.stock_alerts_title), Icons.Outlined.Notifications, onClick = onAlerts)
+            }
             Spacer(Modifier.height(24.dp))
             SectionLabel(stringResource(R.string.tools_insights))
             Spacer(Modifier.height(8.dp))

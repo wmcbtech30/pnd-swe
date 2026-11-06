@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="receiving_details_title">Delivery details</string>
+    <string name="receiving_details_missing">This delivery is no longer available.</string>
+    <string name="receiving_details_date">Received date</string>
+    <string name="receiving_details_recorded">Recorded at</string>
+    <string name="receiving_details_reference">Delivery reference</string>
+    <string name="receiving_details_notes">Notes</string>
+    <string name="receiving_details_immutable">This delivery is kept as history. Use a stock count to correct inventory.</string>
+    <plurals name="receiving_details_units"><item quantity="one">%d unit received</item><item quantity="other">%d units received</item></plurals>
+</resources>

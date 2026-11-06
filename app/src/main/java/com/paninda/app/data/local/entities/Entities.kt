@@ -104,3 +104,21 @@ data class StockCountItemEntity(@PrimaryKey val id: String, val countId: String,
 }
 fun StockCount.toEntity() = StockCountEntity(id, countedAt, countedBy, notes)
 fun StockCountItem.toEntity() = StockCountItemEntity(id, countId, productId, productNameSnapshot, skuSnapshot, vendorIdSnapshot, expectedQuantity, countedQuantity)
+
+@Entity(tableName = "stock_deliveries", indices = [Index("vendorId")],
+    foreignKeys = [ForeignKey(entity = VendorEntity::class, parentColumns = ["id"], childColumns = ["vendorId"])])
+data class StockDeliveryEntity(@PrimaryKey val id: String, val vendorId: String, val vendorNameSnapshot: String,
+    val receivedAt: Long, val recordedAt: Long, val receivedBy: String, val reference: String, val notes: String) {
+    fun toDomain() = StockDelivery(id, vendorId, vendorNameSnapshot, receivedAt, recordedAt, receivedBy, reference, notes)
+}
+@Entity(tableName = "stock_delivery_items", indices = [Index("deliveryId"), Index("productId")],
+    foreignKeys = [
+        ForeignKey(entity = StockDeliveryEntity::class, parentColumns = ["id"], childColumns = ["deliveryId"]),
+        ForeignKey(entity = ProductEntity::class, parentColumns = ["id"], childColumns = ["productId"]),
+    ])
+data class StockDeliveryItemEntity(@PrimaryKey val id: String, val deliveryId: String, val productId: String,
+    val productNameSnapshot: String, val skuSnapshot: String, val quantity: Int) {
+    fun toDomain() = StockDeliveryItem(id, deliveryId, productId, productNameSnapshot, skuSnapshot, quantity)
+}
+fun StockDelivery.toEntity() = StockDeliveryEntity(id, vendorId, vendorNameSnapshot, receivedAt, recordedAt, receivedBy, reference, notes)
+fun StockDeliveryItem.toEntity() = StockDeliveryItemEntity(id, deliveryId, productId, productNameSnapshot, skuSnapshot, quantity)

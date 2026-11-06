@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="receiving_editor_title">Receive stock</string>
+    <string name="receiving_editor_note">Record incoming stock from one vendor. Quantities are added to current stock when confirmed. Only record deliveries that have not already been entered.</string>
+    <string name="receiving_editor_vendor">Choose vendor</string>
+    <string name="receiving_editor_date">Received date (YYYY-MM-DD)</string>
+    <string name="receiving_editor_by">Received by</string>
+    <string name="receiving_editor_reference">Delivery reference (optional)</string>
+    <string name="receiving_editor_notes">Notes (optional)</string>
+    <string name="receiving_editor_add">Add received product</string>
+    <string name="receiving_editor_quantity">Quantity received</string>
+    <string name="receiving_editor_product">%1$s · Current stock: %2$d</string>
+    <string name="receiving_editor_remove">Remove %1$s</string>
+    <string name="receiving_editor_setup">Add an active vendor and their products before recording a delivery.</string>
+    <string name="receiving_editor_total">%1$d product lines · %2$d units received</string>
+    <string name="receiving_editor_review">Review delivery</string>
+    <string name="receiving_editor_confirm_title">Confirm received stock?</string>
+    <string name="receiving_editor_confirm_body">Vendor: %1$s\nReceived: %2$s\n%3$d product lines · %4$d units.\n\nThis adds stock. Confirm this delivery has not already been recorded.</string>
+    <string name="receiving_editor_save">Save delivery</string>
+    <string name="receiving_editor_invalid">Choose an active vendor, enter a recorder and a valid received date (today or earlier), and add quantities from 1 to 1,000,000.</string>
+    <string name="receiving_editor_changed">A vendor or product is no longer available or belongs to another vendor. Check your selection before retrying.</string>
+    <string name="receiving_editor_change_vendor">Change vendor?</string>
+    <string name="receiving_editor_change_body">Changing the vendor clears the selected product lines. Other delivery details are kept.</string>
+    <string name="receiving_picker_search">Search name or SKU</string>
+    <string name="receiving_picker_empty">No matching choices. Check that this vendor has active products.</string>
+</resources>

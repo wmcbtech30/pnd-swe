@@ -26,6 +26,9 @@ object SheetsMapper {
             table("StockCounts", snapshot.counts.map { listOf(it.id, instant(it.countedAt), it.countedBy, it.notes) }),
             table("StockCountItems", snapshot.countItems.map { listOf(it.id, it.countId, it.productId, it.productNameSnapshot,
                 it.skuSnapshot, it.vendorIdSnapshot, it.expectedQuantity.toString(), it.countedQuantity.toString()) }),
+            table("StockDeliveries", snapshot.deliveries.map { listOf(it.id, it.vendorId, it.vendorNameSnapshot, instant(it.receivedAt),
+                instant(it.recordedAt), it.receivedBy, it.reference, it.notes) }),
+            table("StockDeliveryItems", snapshot.deliveryItems.map { listOf(it.id, it.deliveryId, it.productId, it.productNameSnapshot, it.skuSnapshot, it.quantity.toString()) }),
             table("StockMovements", snapshot.movements.map { listOf(it.id, it.productId, it.quantityDelta.toString(),
                 it.movementType, it.sourceId, instant(it.occurredAt), it.reason) }),
         )
@@ -159,7 +162,41 @@ object SheetsMapper {
         ensure(movements.filter { it.movementType == "COUNT_ADJUSTMENT" }.all { movement ->
             countItems.any { it.countId == movement.sourceId && it.productId == movement.productId }
         }, "Unknown count adjustment reference")
-        return ShopSnapshot(vendors, products, transactions, items, movements, counts, countItems)
+        val deliveries = records("StockDeliveries").map { row ->
+            fun optional(key: String, limit: Int) = row[key].orEmpty().trim().also { ensure(it.length <= limit, "Delivery field too long: $key") }
+            val vendorId = row.text("vendor_id")
+            val name = row.text("vendor_name_snapshot")
+            val recorder = row.text("received_by")
+            val receivedAt = row.time("received_at")
+            val recordedAt = row.time("recorded_at")
+            ensure(vendorId in vendorNames && name.length <= 120 && recorder.length <= 120 && receivedAt <= recordedAt, "Invalid delivery vendor, recorder or date")
+            StockDelivery(row.text("delivery_id"), vendorId, name, receivedAt, recordedAt, recorder, optional("reference", 120), optional("notes", 1000))
+        }
+        unique(deliveries.map { it.id }, "delivery IDs")
+        val deliveryIds = deliveries.map { it.id }.toSet()
+        val deliveryItems = records("StockDeliveryItems").map { row ->
+            val quantity = row.integer("quantity")
+            val name = row.text("product_name_snapshot")
+            val sku = row.text("sku_snapshot")
+            ensure(quantity in 1..1_000_000 && name.length <= 120 && Regex("[A-Z0-9._-]{1,64}").matches(sku), "Invalid delivery item")
+            StockDeliveryItem(row.text("delivery_item_id"), row.text("delivery_id"), row.text("product_id"), name, sku, quantity)
+        }
+        unique(deliveryItems.map { it.id }, "delivery item IDs")
+        ensure(deliveryItems.all { it.deliveryId in deliveryIds && it.productId in productIds }, "Unknown delivery reference")
+        val receivedMovements = movements.filter { it.movementType == "RECEIVING" }.groupBy { it.sourceId to it.productId }
+        deliveries.forEach { delivery ->
+            val lines = deliveryItems.filter { it.deliveryId == delivery.id }
+            ensure(lines.isNotEmpty(), "Empty delivery")
+            unique(lines.map { it.productId }, "delivery product IDs")
+            lines.forEach { line ->
+                val matching = receivedMovements[delivery.id to line.productId].orEmpty()
+                ensure(matching.size == 1 && matching.single().quantityDelta == line.quantity && matching.single().occurredAt == delivery.receivedAt,
+                    "Receiving movement does not match delivery item")
+            }
+        }
+        val deliveryRefs = deliveryItems.map { it.deliveryId to it.productId }.toSet()
+        ensure(receivedMovements.keys.all { it in deliveryRefs }, "Unknown receiving movement reference")
+        return ShopSnapshot(vendors, products, transactions, items, movements, counts, countItems, deliveries, deliveryItems)
     }
 
     private fun Map<String, String>.text(key: String): String =

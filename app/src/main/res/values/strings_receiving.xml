@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="receiving_title">Stock Receiving</string>
+    <string name="receiving_search">Search vendor, reference or recorder</string>
+    <string name="receiving_empty">No deliveries recorded yet.</string>
+    <string name="receiving_new">Receive stock</string>
+</resources>

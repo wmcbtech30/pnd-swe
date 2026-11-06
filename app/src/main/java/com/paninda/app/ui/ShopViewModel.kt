@@ -70,6 +70,8 @@ class ShopViewModel(private val repository: ShopRepository, private val google: 
     suspend fun saveProduct(id: String?, draft: ProductDraft) = repository.saveProduct(id, draft)
     suspend fun saveVendor(id: String?, draft: VendorDraft) = repository.saveVendor(id, draft)
     suspend fun setVendorActive(id: String, active: Boolean) = repository.setVendorActive(id, active)
+    suspend fun recordReceiving(draft: ReceivingDraft) = repository.recordReceiving(draft)
+    suspend fun deliveryItems(id: String) = repository.deliveryItems(id)
     suspend fun recordSale(draft: SaleDraft) = repository.recordSale(draft)
     suspend fun recordCount(draft: CountDraft) = repository.recordCount(draft)
     suspend fun countItems(id: String) = repository.countItems(id)

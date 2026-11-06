@@ -76,7 +76,10 @@ class StockNotificationsTest {
             controller.start()
             until { sink.quiet.get() > quietBefore }
             assertEquals(2, sink.alerts.get())
-            count(5)
+            val deliveryProduct = product()
+            assertTrue(repo.recordReceiving(ReceivingDraft(UUID.randomUUID().toString(), deliveryProduct.vendorId,
+                java.time.LocalDate.now(ShopZone).toString(), "Recorder", "RESTOCK-001", "",
+                listOf(ReceivingLineDraft(deliveryProduct.id, "5")))) is RecordResult.Saved)
             until { !sink.visible && store.read().isEmpty() }
             count(3)
             until { sink.alerts.get() == 3 }

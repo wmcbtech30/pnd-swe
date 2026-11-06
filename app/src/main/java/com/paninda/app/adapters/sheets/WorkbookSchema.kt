@@ -17,6 +17,8 @@ object WorkbookSchema {
             "vendor_id_snapshot", "quantity", "unit_price_minor"),
         "StockCounts" to listOf("count_id", "counted_at", "counted_by", "notes"),
         "StockCountItems" to listOf("count_item_id", "count_id", "product_id", "product_name_snapshot", "sku_snapshot", "vendor_id_snapshot", "expected_quantity", "counted_quantity"),
+        "StockDeliveries" to listOf("delivery_id", "vendor_id", "vendor_name_snapshot", "received_at", "recorded_at", "received_by", "reference", "notes"),
+        "StockDeliveryItems" to listOf("delivery_item_id", "delivery_id", "product_id", "product_name_snapshot", "sku_snapshot", "quantity"),
         "StockMovements" to listOf("movement_id", "product_id", "quantity_delta",
             "movement_type", "source_id", "occurred_at", "reason"),
     )

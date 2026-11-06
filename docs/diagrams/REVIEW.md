@@ -22,3 +22,7 @@ Reviewed revision logs 006–009, 011 and 012 alongside current implementation. 
 Both XML files parse successfully, have unique cell IDs and valid edge endpoints, and preserve all 6 context and 28 Level 1 directed flows from the revised Mermaid sources. Level 0 has one circular process and no stores. Level 1 has six circular processes and two logical stores, represented by parallel horizontal lines. External service flows match verbatim between levels. No entity-to-store, store-to-store or entity-to-entity flows are introduced. No application code changed; application build/tests were not rerun for documentation-only changes.
 
 For publication, open a `.drawio` file in diagrams.net and use File → Export as → SVG after checking label placement at the desired page size. SVG exports have not been generated or visually verified in this review.
+
+## Receiving revision note
+
+Revision 013 adds stock receiving. The Mermaid sources now include delivery inputs/outputs and process 7.0 with its four flows (32 Level 1 flows total). The editable `.drawio` files above are preserved as the reviewed pre-receiving snapshots of `cc26d4a`; regenerate them from the updated Mermaid sources before using them to describe revision 013.

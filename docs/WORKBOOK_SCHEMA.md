@@ -21,6 +21,8 @@ original exact header order, preventing writes from reassigning manual columns.
 | SaleItems (Paninda) | `sale_item_id, sale_id, product_id, product_name_snapshot, vendor_id_snapshot, quantity, unit_price_minor` |
 | StockCounts (Paninda) | `count_id, counted_at, counted_by, notes` |
 | StockCountItems (Paninda) | `count_item_id, count_id, product_id, product_name_snapshot, sku_snapshot, vendor_id_snapshot, expected_quantity, counted_quantity` |
+| StockDeliveries (Paninda) | `delivery_id, vendor_id, vendor_name_snapshot, received_at, recorded_at, received_by, reference, notes` |
+| StockDeliveryItems (Paninda) | `delivery_item_id, delivery_id, product_id, product_name_snapshot, sku_snapshot, quantity` |
 | StockMovements (Paninda) | `movement_id, product_id, quantity_delta, movement_type, source_id, occurred_at, reason` |
 
 Required metadata:
@@ -74,12 +76,12 @@ shop_timezone   Asia/Manila
   must resolve. Product version increments even for a matching count so other
   open counts must recheck. Open count baselines are local form data; saving
   requires unchanged product version and expected stock, inside one transaction.
-- Current contract adds StockCounts and StockCountItems, making eight app-owned
+- Current contract adds StockCounts and StockCountItems, alongside StockDeliveries and StockDeliveryItems, making ten app-owned
   worksheets. Room and Sheets schema stay at fresh-install version 1. There is
   no schema migration or backward compatibility support.
 
 This contract covers product metadata, stock movements, completed-sale records
-and completed physical counts.
+completed physical counts and incoming stock deliveries.
 Void/refund/discount/tax/consignor-settlement rules are not defined yet. Extend
 the schema explicitly when those workflows are designed.
 
@@ -95,3 +97,27 @@ This prototype uses a fresh version-1 schema, including all ten vendor columns.
 There are no schema upgrades, migrations, unsuffixed worksheet renames or legacy
 header support. Use a fresh installation and new app worksheets for testing; an
 older two-column Vendors worksheet is rejected rather than converted.
+
+Stock receiving records one active vendor's delivery. Each distinct active product
+must currently belong to that vendor, with a positive received quantity up to
+1,000,000. Saving increases ledger-derived stock, increments product version and
+queues header/items/movements together; repeating the same delivery ID does not
+add stock twice. Product selling prices remain unchanged.
+
+`received_at` is the selected received date at midnight in Asia/Manila;
+`recorded_at` is the actual save time. App entry rejects invalid/future dates.
+Backdated entries add stock when saved; they do not recalculate past counts.
+Each RECEIVING movement has `source_id = delivery_id`, the item's positive
+quantity and the delivery's `received_at`. Import validates one exact matching
+movement per delivery item and rejects orphan receiving movements. Received time
+must not exceed recorded time. Vendor/product references must resolve, but current
+product/vendor names and assignments may differ from their historical snapshots.
+
+Vendor/name snapshots and recorder are nonempty, up to 120 characters; reference
+is optional up to 120, notes optional up to 1,000. SKU snapshots follow the usual
+SKU format. Every delivery has at least one item and no duplicate product lines.
+Completed deliveries are immutable in the UI; returns/voids are not implemented.
+
+This is a revised fresh schema 1, with ten worksheets and corresponding Room
+stock-delivery tables. No schema migrations or backward compatibility are added.
+Use an uninstall/fresh installation and a new file/fresh app worksheets for tests.

@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "3950938d508855b2e8816f7289db98fb",
+    "identityHash": "b0f255dd010a7f45ac8372fb47fa8d58",
     "entities": [
       {
         "tableName": "vendors",
@@ -657,11 +657,187 @@
             ]
           }
         ]
+      },
+      {
+        "tableName": "stock_deliveries",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `vendorId` TEXT NOT NULL, `vendorNameSnapshot` TEXT NOT NULL, `receivedAt` INTEGER NOT NULL, `recordedAt` INTEGER NOT NULL, `receivedBy` TEXT NOT NULL, `reference` TEXT NOT NULL, `notes` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`vendorId`) REFERENCES `vendors`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "vendorId",
+            "columnName": "vendorId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "vendorNameSnapshot",
+            "columnName": "vendorNameSnapshot",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "receivedAt",
+            "columnName": "receivedAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "recordedAt",
+            "columnName": "recordedAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "receivedBy",
+            "columnName": "receivedBy",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "reference",
+            "columnName": "reference",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "notes",
+            "columnName": "notes",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_stock_deliveries_vendorId",
+            "unique": false,
+            "columnNames": [
+              "vendorId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_stock_deliveries_vendorId` ON `${TABLE_NAME}` (`vendorId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "vendors",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "vendorId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "stock_delivery_items",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `deliveryId` TEXT NOT NULL, `productId` TEXT NOT NULL, `productNameSnapshot` TEXT NOT NULL, `skuSnapshot` TEXT NOT NULL, `quantity` INTEGER NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`deliveryId`) REFERENCES `stock_deliveries`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`productId`) REFERENCES `products`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "deliveryId",
+            "columnName": "deliveryId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "productId",
+            "columnName": "productId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "productNameSnapshot",
+            "columnName": "productNameSnapshot",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "skuSnapshot",
+            "columnName": "skuSnapshot",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "quantity",
+            "columnName": "quantity",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_stock_delivery_items_deliveryId",
+            "unique": false,
+            "columnNames": [
+              "deliveryId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_stock_delivery_items_deliveryId` ON `${TABLE_NAME}` (`deliveryId`)"
+          },
+          {
+            "name": "index_stock_delivery_items_productId",
+            "unique": false,
+            "columnNames": [
+              "productId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_stock_delivery_items_productId` ON `${TABLE_NAME}` (`productId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "stock_deliveries",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "deliveryId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "products",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "productId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
       }
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '3950938d508855b2e8816f7289db98fb')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b0f255dd010a7f45ac8372fb47fa8d58')"
     ]
   }
 }

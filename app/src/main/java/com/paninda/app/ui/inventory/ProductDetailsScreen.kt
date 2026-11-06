@@ -57,6 +57,7 @@ fun ProductDetailsScreen(productId: String, products: List<Product>, vm: ShopVie
                 DetailField(stringResource(R.string.product_details_movement,
                     when (movement.movementType) {
                         "OPENING" -> stringResource(R.string.product_details_opening)
+                        "RECEIVING" -> stringResource(R.string.movement_reports_receiving)
                         "SALE" -> stringResource(R.string.movement_reports_sale)
                         "COUNT_ADJUSTMENT" -> stringResource(R.string.movement_reports_count)
                         else -> movement.movementType

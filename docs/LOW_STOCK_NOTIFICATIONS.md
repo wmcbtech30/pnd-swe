@@ -2,7 +2,7 @@
 
 No Firebase or server is required. Notifications use the inventory already saved
 on this device. The app observes committed Room changes after product edits,
-recorded sales, confirmed counts and imported manual-sync changes. It also checks
+recorded sales, confirmed counts, stock receiving and imported manual-sync changes. It also checks
 on process startup. There is no remote polling, new sync schedule, background
 worker or notification foreground service.
 
@@ -50,7 +50,8 @@ process cannot fetch remote changes or observe inventory elsewhere. New alerts
 are evaluated from the current local snapshot on reopening; state changes that
 happen entirely between evaluations are not a historical alert feed. No server
 push, scheduled reminders or automatic sync is added in this branch.
-Room/workbook schemas and the eight-worksheet contract are unchanged.
+Notification preferences/markers do not change the Room/workbook contract.
+The current app contract includes ten worksheets, including stock deliveries.
 
 ## Device acceptance
 
@@ -58,7 +59,7 @@ Room/workbook schemas and the eight-worksheet contract are unchanged.
    explanation, grant notification permission and inspect the summary/bag icon.
 2. Record another sale while still low: update the balance quietly. Sell the
    remaining units: an out-of-stock alert may sound again.
-3. Confirm a count above threshold: remove the notification. Lower it again:
+3. Record a delivery or confirm a count above threshold: remove the notification. Lower it again:
    allow a fresh low warning. Restock an empty product to positive-but-low stock:
    no new low warning, but reaching zero again allows a fresh out warning.
 4. Dismiss a notification, recreate/reopen the app and rename the same low

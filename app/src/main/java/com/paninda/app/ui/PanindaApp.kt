@@ -20,6 +20,7 @@ import com.paninda.app.ui.home.HomeScreen
 import com.paninda.app.ui.sell.SellScreen
 import com.paninda.app.ui.sell.RecordSaleScreen
 import com.paninda.app.ui.counts.*
+import com.paninda.app.ui.receiving.*
 import com.paninda.app.ui.vendors.*
 import com.paninda.app.ui.reports.*
 import com.paninda.app.ui.inventory.*
@@ -72,7 +73,7 @@ private fun ConnectedApp(vm: ShopViewModel, state: ShopState, resolveGoogle: Res
     }
     val entry by nav.currentBackStackEntryAsState()
     val route = entry?.destination?.route.orEmpty().ifEmpty { "home" }
-    val editor = route.startsWith("product/new") || route == "vendor/new" || route.startsWith("sale/new") || route == "counts/new" || route.endsWith("/edit")
+    val editor = route.startsWith("product/new") || route == "vendor/new" || route.startsWith("sale/new") || route == "counts/new" || route == "receiving/new" || route.endsWith("/edit")
     val snackbar = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -155,7 +156,17 @@ private fun ConnectedApp(vm: ShopViewModel, state: ShopState, resolveGoogle: Res
                     onProduct = { nav.navigate("product/" + Uri.encode(it)) })
             }
             composable("history") { HistoryScreen(state.transactions) { nav.navigate("transaction/" + Uri.encode(it)) } }
-            composable("tools") { ToolsScreen({ nav.navigate("stock-alerts") }, { nav.navigate("counts") }, { nav.navigate("reports") }, { nav.navigate("vendors") }, { nav.navigate("sync") }, { nav.navigate("settings") }) }
+            composable("tools") { ToolsScreen({ nav.navigate("receiving") }, { nav.navigate("stock-alerts") }, { nav.navigate("counts") }, { nav.navigate("reports") }, { nav.navigate("vendors") }, { nav.navigate("sync") }, { nav.navigate("settings") }) }
+            composable("receiving") { ReceivingScreen(state.deliveries, { nav.popBackStack() }, { nav.navigate("receiving/new") },
+                { nav.navigate("receiving/" + Uri.encode(it)) }) }
+            composable("receiving/new") { NewReceivingScreen(state, vm, { nav.popBackStack() }) { id ->
+                nav.popBackStack()
+                nav.navigate("receiving/" + Uri.encode(id))
+            } }
+            composable("receiving/{id}", arguments = listOf(navArgument("id") { type = NavType.StringType })) { entry ->
+                ReceivingDetailsScreen(requireNotNull(entry.arguments?.getString("id")), state.deliveries, vm, { nav.popBackStack() },
+                    { nav.navigate("product/" + Uri.encode(it)) })
+            }
             composable("stock-alerts") { StockAlertsScreen(state.products, { nav.popBackStack() },
                 { nav.navigate("product/" + Uri.encode(it)) }) }
             composable("reports") {

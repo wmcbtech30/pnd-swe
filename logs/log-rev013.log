@@ -1,0 +1,67 @@
+Paninda revision 013 — stock receiving and Management spacing
+Date: 2026-11-06 (Asia/Manila)
+Branch: litmus_4
+Base: cc26d4a
+
+REQUEST
+Implement Stock Receiving under Management and make gaps between Vendors,
+Stock Counts and Stock Alerts consistent. Preserve the existing local-first,
+modular adapter, clean-data and no-migration testing requirements.
+
+IMPLEMENTED
+- Tools Management now groups Vendors, Stock Receiving, Stock Counts and Stock
+  Alerts with Arrangement.spacedBy(8.dp). Section breaks remain 24dp.
+- Separate receiving history, new-entry, details and picker Kotlin files with
+  page-specific string resources. History searches vendor/reference/recorder and
+  filters received dates; fixed headers/search and isolated lists/FAB padding.
+- New delivery: choose active vendor; select that vendor's active products,
+  including zero-stock products; enter quantities, received date and recorder,
+  optional delivery reference/notes. Changing vendor confirms clearing lines.
+  Drafts survive recreation, leaving warns before discard, confirmation explains
+  additive stock and avoiding duplicate deliveries. Editor hides bottom navigation.
+- Separate StockDelivery/StockDeliveryItem domain models and ReceivingRepository.
+  Atomic save writes immutable vendor/product/SKU snapshots, positive RECEIVING
+  movements, product versions/timestamps and pending changes. Stable record IDs
+  make repeat saves idempotent. No selling-price or payment change.
+- Reject empty/duplicate lines, quantities outside 1..1,000,000, inactive/mismatched
+  vendor/products, invalid/future dates and stock/version overflow before writes.
+  Received date maps to midnight Asia/Manila; actual recording time is retained.
+  Backdated entries affect current stock on save without rebuilding past counts.
+- Room delivery tables/DAO/state, reset and transactional sync import/export now
+  include delivery history. Existing stock reports observe receiving movements;
+  product details label receiving correctly. Notification recovery/rearming follows
+  the same committed stock data. Counts opened before delivery reject stale stock.
+- Sheets adds StockDeliveries and StockDeliveryItems (Paninda), making ten app
+  worksheets with A1 headers. Validates historical snapshots, references, distinct
+  lines and exact receiving movement source/quantity/date matches. Names/current
+  assignments can change later without rewriting delivery snapshots.
+- Fresh Room/schema metadata remain version 1 with revised exported schema. No
+  migrations, schema upgrades or backward compatibility. Use uninstall/new file
+  or fresh app worksheets for testing. Setup text and contract now say ten pages.
+- Updated prototype, workbook/setup/notification docs and Mermaid DFD sources;
+  Level 1 adds process 7.0 Receive Stock Deliveries, keeping existing numbers.
+
+VERIFICATION
+Two focused receiving checks cover
+atomic validation/idempotency/overflow/stale counts, snapshot retention,
+Sheets validation and reset/import. Existing UI smoke adds receiving creation
+and recreation. Notification check now uses a real receiving save to prove
+restocking recovery. No maintained layout tests or demo data added.
+
+LIMITS
+No purchase orders, cost accounting, vendor payments, returns, editing/voiding
+posted deliveries or automatic sync. Inventory/vendor/product receiving shortcuts
+outside Management are not added in this request. Live device/Google acceptance
+remains documented separately. No GitHub push or Drive upload requested.
+
+FINAL CHECKS
+- All 30 maintained checks passed. After the final editor error-scroll refinement,
+  the existing end-to-end UI smoke passed again.
+- Two ignored, temporary renders inspected: Management cards have equal 8dp gaps;
+  receiving form uses the existing palette, item cards and icon action button.
+  No screenshot/layout tests were added to maintained sources.
+- assembleDebug and lintDebug passed; lint reports zero errors/fatal findings
+  and 28 warnings. git diff --check passed.
+- APK: app/build/outputs/apk/debug/app-debug.apk (local build only).
+- No physical-device or live Google round-trip acceptance claimed. Fresh install
+  and fresh ten-worksheet app contract required; no migration added.
